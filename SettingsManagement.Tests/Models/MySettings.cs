@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SettingsManagement.Tests.Models
 {
@@ -10,7 +11,7 @@ namespace SettingsManagement.Tests.Models
             //If not present --> T Parse(string) method?
             //Else null
 
-            _MyFirstProperty = SettingsBuilder<int>.Create(nameof(MyFirstProperty), 5, int.Parse);
+            _MyFirstProperty = SettingsBuilder<long>.Create(nameof(MyFirstProperty), 1345L, null);
             _MyFirstProperty.Description = "This is a description";
 
             _MySecondProperty = SettingsBuilder<bool>.Create(nameof(MySecondProperty), default(bool), null);
@@ -18,11 +19,13 @@ namespace SettingsManagement.Tests.Models
             _MyThirdProperty = SettingsBuilder<string>.Create(nameof(MyThirdProperty), "Test", null);
             _MyThirdProperty.Description = "This is another description";
 
-            _MyFourthProperty = SettingsBuilder<TimeSpan>.ParseAndCreate(nameof(MyFourthProperty), "02:00", TimeSpan.Parse);
+            _MyFourthProperty = SettingsBuilder<TimeSpan>.ParseAndCreate(nameof(MyFourthProperty), "02:00", typeof(TimeSpanConverter));
+
+            _MyFifthProperty = SettingsBuilder<bool>.ParseAndCreate(nameof(MyFifthProperty), "Ja", typeof(JaNeeConverter));
         }
 
-        readonly Setting<int> _MyFirstProperty;
-        public int MyFirstProperty
+        readonly Setting<long> _MyFirstProperty;
+        public long MyFirstProperty
         {
             get => _MyFirstProperty.Value;
             set => _MyFirstProperty.Value = value;
@@ -49,6 +52,12 @@ namespace SettingsManagement.Tests.Models
             set => _MyFourthProperty.Value = value;
         }
 
+        readonly Setting<bool> _MyFifthProperty;
+        public bool MyFifthProperty
+        {
+            get => _MyFifthProperty.Value;
+            set => _MyFifthProperty.Value = value;
+        }
 
         public void Refresh()
         {
@@ -57,6 +66,7 @@ namespace SettingsManagement.Tests.Models
             _MyFirstProperty.Refresh();
             _MySecondProperty.Refresh();
             _MyThirdProperty.Refresh();
+            _MyFourthProperty.Refresh();
         }
 
         public void Persist()
@@ -66,8 +76,20 @@ namespace SettingsManagement.Tests.Models
             _MyFirstProperty.Persist(configuration);
             _MySecondProperty.Persist(configuration);
             _MyThirdProperty.Persist(configuration);
+            _MyFourthProperty.Persist(configuration);
 
             ConfigurationHelper.Persist(configuration);
+        }
+
+        public IEnumerable<string> GetReadableValues()
+        {
+            return new string[]
+            {
+                _MyFirstProperty.GetReadableValue(),
+                _MySecondProperty.GetReadableValue(),
+                _MyThirdProperty.GetReadableValue(),
+                _MyFourthProperty.GetReadableValue()
+            };
         }
     }
 }

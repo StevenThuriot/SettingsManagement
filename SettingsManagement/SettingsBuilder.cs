@@ -4,25 +4,18 @@ namespace SettingsManagement
 {
     static class SettingsBuilder<T>
     {
-        public static Setting<T> Init(string key)
+        public static Setting<T> Create(string key, T defaultValue, Type converterType)
         {
-            return new Setting<T>(key, default(T), ConversionHelper<T>.Convert);
-        }
-
-        public static Setting<T> Create(string key, T defaultValue, Func<string, T> converter)
-        {
-            if (converter == null)
-                converter = ConversionHelper<T>.Convert;
+            var converter = ConversionHelper<T>.Resolve(converterType);
 
             return new Setting<T>(key, defaultValue, converter);
         }
 
-        public static Setting<T> ParseAndCreate(string key, string defaultValue, Func<string, T> converter)
+        public static Setting<T> ParseAndCreate(string key, string defaultValue, Type converterType)
         {
-            if (converter == null)
-                converter = ConversionHelper<T>.Convert;
-
+            var converter = ConversionHelper<T>.Resolve(converterType);
             var convertedDefaultValue = converter(defaultValue);
+
             return new Setting<T>(key, convertedDefaultValue, converter);
         }
     }

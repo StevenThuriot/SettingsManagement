@@ -1,4 +1,5 @@
 using SettingsManagement.Tests.Models;
+using System;
 using Xunit;
 
 namespace SettingsManagement.Tests
@@ -8,7 +9,7 @@ namespace SettingsManagement.Tests
         [Fact]
         public void AnEntityIsCreated()
         {
-            var settings = SettingsManager.Get<IMySettings>();
+            var settings = SettingsManager.New<IMySettings>();
 
             Assert.NotNull(settings);
         }
@@ -16,25 +17,20 @@ namespace SettingsManagement.Tests
         [Fact]
         public void AnEntityHasFields()
         {
-            var settings = SettingsManager.Get<IMySettings>();
+            var settings = SettingsManager.New<IMySettings>();
             var value = settings.MyFirstProperty;
-        }
-
-        [Fact]
-        public void AnEntityHasFieldsThatCanBeSet()
-        {
-            var settings = SettingsManager.Get<IMySettings>();
-
-            settings.MyFirstProperty = 1;
-            Assert.Equal(1, settings.MyFirstProperty);
         }
 
         [Fact]
         public void FieldsHaveDefaultValues()
         {
-            var settings = SettingsManager.Get<IMySettings>();
+            var settings = SettingsManager.New<IMySettings>();
 
             Assert.Equal(5, settings.MyFirstProperty);
+            Assert.False(settings.MySecondProperty);
+            Assert.Equal("Test", settings.MyThirdProperty);
+            Assert.Equal(TimeSpan.FromMinutes(20), settings.MyFourthProperty);
+            Assert.True(settings.MyFifthProperty);
         }
     }
 }
