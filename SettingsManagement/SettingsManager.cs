@@ -7,47 +7,6 @@ namespace SettingsManagement
 {
     public static class SettingsManager
     {
-        static class TypedSettingsManager<T>
-        {
-            static readonly IDictionary<string, T> _managers = new Dictionary<string, T>();
-
-            public static T New()
-            {
-                if (!_managerTypes.TryGetValue(typeof(T), out var managerType))
-                {
-                    lock (_managerTypes)
-                    {
-                        if (!_managerTypes.TryGetValue(typeof(T), out managerType))
-                        {
-                            var myTypeInfo = CompileResultTypeInfo(typeof(T));
-                            _managerTypes[typeof(T)] = managerType = myTypeInfo.AsType();
-                        }
-                    }
-                }
-
-                var myObject = Activator.CreateInstance(managerType);
-                return (T)myObject;
-            }
-
-            public static T Get(string key)
-            {
-                key += "_" + typeof(T).FullName;
-
-                if (!_managers.TryGetValue(key, out var manager))
-                {
-                    lock (_managers)
-                    {
-                        if (!_managers.TryGetValue(key, out manager))
-                        {
-                            _managers[key] = manager = New();
-                        }
-                    }
-                }
-
-                return manager;
-            }
-        }
-
         const MethodAttributes PropertyAttributes = MethodAttributes.Public
                                                              | MethodAttributes.Final
                                                              | MethodAttributes.HideBySig
@@ -67,9 +26,29 @@ namespace SettingsManagement
             _moduleBuilder = _assemblyBuilder.DefineDynamicModule("SettingsManagement.Emit.Module");
         }
 
-        public static T New<T>() => TypedSettingsManager<T>.New();
+        public static T New<T>()
+        {
+            if (!_managerTypes.TryGetValue(typeof(T), out var managerType))
+            {
+                lock (_managerTypes)
+                {
+                    if (!_managerTypes.TryGetValue(typeof(T), out managerType))
+                    {
+                        var myTypeInfo = CompileResultTypeInfo(typeof(T));
+                        _managerTypes[typeof(T)] = managerType = myTypeInfo.AsType();
+                    }
+                }
+            }
 
-        public static T Get<T>(string key = null) => TypedSettingsManager<T>.Get(key);
+            var myObject = Activator.CreateInstance(managerType);
+            return (T)myObject;
+        }
+
+        //public static T Get<T>(string key = null)
+        //{
+        //    return SettingsContext.ApplicationContext.Get<T>(key);
+        //}
+
 
         public static TypeInfo CompileResultTypeInfo(Type type)
         {

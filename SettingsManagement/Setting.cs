@@ -8,20 +8,20 @@ namespace SettingsManagement
     sealed class Setting<T>
     {
         T _defaultValue;
-        readonly Func<string, T> _converter;
+        readonly IValueConverter<T> _converter;
 
         public T Value { get; set; }
 
         public Type Type { get; } = typeof(T);
 
         public string Key { get; }
-        public string Description { get; set; }
+        public string Description { get; set; } = "";
 
 
-        public Setting(string key, T defaultValue, Func<string, T> converter)
+        public Setting(string key, T defaultValue, IValueConverter<T> converter)
         {
-            Key = key ?? throw new ArgumentNullException(nameof(key));
-            _converter = converter ?? throw new ArgumentNullException(nameof(converter));
+            Key = key;
+            _converter = converter;
 
             Value = _defaultValue = defaultValue;
 
@@ -50,7 +50,7 @@ namespace SettingsManagement
 
             if (ConfigurationManager.AppSettings.AllKeys.Any(n => n == Key))
             {
-                Value = _defaultValue = _converter(ConfigurationManager.AppSettings.Get(Key));
+                Value = _defaultValue = _converter.Convert(ConfigurationManager.AppSettings.Get(Key));
             }
         }
 
@@ -61,7 +61,7 @@ namespace SettingsManagement
 
         public void Persist(KeyValueConfigurationCollection settings)
         {
-            string stringValue = Value?.ToString() ?? "";
+            string stringValue = _converter.ConvertBack(Value);
 
             var configItem = settings[Key];
             if (configItem == null)
@@ -76,19 +76,21 @@ namespace SettingsManagement
 
         public string GetReadableValue()
         {
-            if (Value == null)
-                return null;
+            var value = Value;
 
-            if (Value is string @string)
+            if (value == null)
+                return "";
+
+            if (value is string @string)
                 return @string;
 
-            if (Value is IEnumerable enumerable)
+            if (value is IEnumerable enumerable)
             {
                 var @array = enumerable.Cast<object>().ToArray();
-                return $"{enumerable.GetType().FullName}(Count = {@array.Length}) {{ {string.Join(", ", @array)} }}";
+                return $"{enumerable.GetType().FullName} (Count = {@array.Length}) {{ {string.Join(", ", @array)} }}";
             }
 
-            return Value.ToString();
+            return value.ToString();
         }
     }
 }

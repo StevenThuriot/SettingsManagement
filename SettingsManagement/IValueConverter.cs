@@ -1,7 +1,8 @@
 ﻿namespace SettingsManagement
 {
-    public interface IConverter<T>
+    public interface IValueConverter<T>
     {
         T Convert(string value);
+        string ConvertBack(T value);
     }
 }

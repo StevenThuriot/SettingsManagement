@@ -42,37 +42,43 @@ namespace SettingsManagement.Tests
         [Fact]
         public void SettingsAreRememberedBetweenGets()
         {
-            var settings = SettingsManager.Get<IMySettings>();
+            using (var scope = SettingsContext.BeginScope())
+            {
+                var settings = scope.Get<IMySettings>();
 
-            var value = GetRandomLong();
-            Assert.NotEqual(value, settings.MyFirstProperty);
+                var value = GetRandomLong();
+                Assert.NotEqual(value, settings.MyFirstProperty);
 
-            settings.MyFirstProperty = value;
-            Assert.Equal(value, settings.MyFirstProperty);
+                settings.MyFirstProperty = value;
+                Assert.Equal(value, settings.MyFirstProperty);
 
-            var settings2 = SettingsManager.Get<IMySettings>();
-            Assert.Equal(value, settings2.MyFirstProperty);
+                var settings2 = scope.Get<IMySettings>();
+                Assert.Equal(value, settings2.MyFirstProperty);
+            }
         }
 
         [Fact]
         public void SettingsAreRememberedBetweenGetsBasedOnKey()
         {
-            var settings = SettingsManager.Get<IMySettings>("TEST1");
+            using (var scope = SettingsContext.BeginScope())
+            {
+                var settings = scope.Get<IMySettings>("TEST1");
 
-            var value = GetRandomLong();
-            Assert.NotEqual(value, settings.MyFirstProperty);
+                var value = GetRandomLong();
+                Assert.NotEqual(value, settings.MyFirstProperty);
 
-            settings.MyFirstProperty = value;
-            Assert.Equal(value, settings.MyFirstProperty);
+                settings.MyFirstProperty = value;
+                Assert.Equal(value, settings.MyFirstProperty);
 
-            var settings2 = SettingsManager.Get<IMySettings>("TEST1");
-            Assert.Equal(value, settings2.MyFirstProperty);
+                var settings2 = scope.Get<IMySettings>("TEST1");
+                Assert.Equal(value, settings2.MyFirstProperty);
 
-            var settings3 = SettingsManager.Get<IMySettings>("TEST2");
-            Assert.NotEqual(value, settings3.MyFirstProperty);
+                var settings3 = scope.Get<IMySettings>("TEST2");
+                Assert.NotEqual(value, settings3.MyFirstProperty);
 
-            var settings4 = SettingsManager.Get<IMySettings>();
-            Assert.NotEqual(value, settings4.MyFirstProperty);
+                var settings4 = scope.Get<IMySettings>();
+                Assert.NotEqual(value, settings4.MyFirstProperty);
+            }
         }
     }
 }

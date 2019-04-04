@@ -2,11 +2,19 @@
 
 namespace SettingsManagement.Tests.Models
 {
-    class TimeSpanConverter : IConverter<TimeSpan>
+    class TimeSpanConverter : IValueConverter<TimeSpan>
     {
         public TimeSpan Convert(string value)
         {
-            return TimeSpan.Parse(value);
+            if (TimeSpan.TryParse(value, out var result))
+                return result;
+
+            return TimeSpan.Zero;
+        }
+
+        public string ConvertBack(TimeSpan value)
+        {
+            return value.ToString();
         }
     }
 }

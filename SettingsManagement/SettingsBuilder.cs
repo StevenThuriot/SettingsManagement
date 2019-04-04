@@ -14,7 +14,7 @@ namespace SettingsManagement
         public static Setting<T> ParseAndCreate(string key, string defaultValue, Type converterType)
         {
             var converter = ConversionHelper<T>.Resolve(converterType);
-            var convertedDefaultValue = converter(defaultValue);
+            var convertedDefaultValue = converter.Convert(defaultValue);
 
             return new Setting<T>(key, convertedDefaultValue, converter);
         }

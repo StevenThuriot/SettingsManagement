@@ -9,7 +9,6 @@ namespace SettingsManagement
         public static readonly MethodInfo OpenConfigurationMethod = new Func<Configuration>(OpenConfiguration).Method;
         public static readonly MethodInfo RefreshAppSettingsMethod = new Action(RefreshAppSettings).Method;
         public static readonly MethodInfo PersistMethod = new Action<Configuration>(Persist).Method;
-        
 
         public static Configuration OpenConfiguration()
         {
