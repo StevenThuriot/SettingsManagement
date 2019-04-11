@@ -1,4 +1,6 @@
-﻿namespace SettingsManagement.Tests.Models
+﻿using SettingsManagement.Interfaces;
+
+namespace SettingsManagement.Tests.Models
 {
     class JaNeeConverter : IValueConverter<bool>
     {

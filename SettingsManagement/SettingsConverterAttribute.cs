@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SettingsManagement.Interfaces;
+using System;
 
 namespace SettingsManagement
 {

@@ -1,5 +1,8 @@
-﻿using System;
+﻿using SettingsManagement.BuildingBlocks;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -7,17 +10,8 @@ namespace SettingsManagement
 {
     public static class SettingsManager
     {
-        const MethodAttributes PropertyAttributes = MethodAttributes.Public
-                                                             | MethodAttributes.Final
-                                                             | MethodAttributes.HideBySig
-                                                             | MethodAttributes.SpecialName
-                                                             | MethodAttributes.NewSlot
-                                                             | MethodAttributes.Virtual;
-
         static readonly AssemblyBuilder _assemblyBuilder;
         static readonly ModuleBuilder _moduleBuilder;
-
-        static readonly IDictionary<Type, Type> _managerTypes = new Dictionary<Type, Type>();
 
         static SettingsManager()
         {
@@ -26,152 +20,42 @@ namespace SettingsManagement
             _moduleBuilder = _assemblyBuilder.DefineDynamicModule("SettingsManagement.Emit.Module");
         }
 
-        public static T New<T>()
+        public static T New<T>() => Creator<T>.BuildNewInstance();
+
+        static class Creator<T>
         {
-            if (!_managerTypes.TryGetValue(typeof(T), out var managerType))
+            public static Func<T> BuildNewInstance { get; }
+
+            /// <summary>
+            /// Cached Building Delegate
+            /// </summary>
+            /// <remarks>
+            /// <para>
+            /// Static constructors are guaranteed to be run only once per application domain, before any instances of a class are created or any static members are accessed.
+            /// http://msdn.microsoft.com/en-us/library/aa645612.aspx
+            /// </para>
+            /// <para>
+            /// The implementation shown is thread safe for the initial construction, that is, no locking or null testing is required for constructing the Singleton object. 
+            /// </para>
+            /// <para>
+            /// However, this does not mean that any use of the instance will be synchronised.There are a variety of ways that this can be done; I've shown one below.
+            /// </para>
+            /// </remarks>
+            static Creator()
             {
-                lock (_managerTypes)
-                {
-                    if (!_managerTypes.TryGetValue(typeof(T), out managerType))
-                    {
-                        var myTypeInfo = CompileResultTypeInfo(typeof(T));
-                        _managerTypes[typeof(T)] = managerType = myTypeInfo.AsType();
-                    }
-                }
+                var block = _moduleBuilder.Create(typeof(T))
+                                          .WithConstructor()
+                                          .WithRefreshIfNeeded()
+                                          .WithPersistIfNeeded()
+                                          .WithReadableValuesIfNeeded()
+                                          .WithDisposeIfNeeded();
+
+                var type = block.Build();
+                var newExpression = Expression.New(type.GetConstructors().Single());
+                var lambda = Expression.Lambda<Func<T>>(newExpression);
+
+                BuildNewInstance = lambda.Compile();
             }
-
-            var myObject = Activator.CreateInstance(managerType);
-            return (T)myObject;
-        }
-
-        //public static T Get<T>(string key = null)
-        //{
-        //    return SettingsContext.ApplicationContext.Get<T>(key);
-        //}
-
-
-        public static TypeInfo CompileResultTypeInfo(Type type)
-        {
-            var typeBuilder = _moduleBuilder.DefineType("SettingsManagement.Emit." + type.FullName,
-                                                            TypeAttributes.Public
-                                                            | TypeAttributes.Class
-                                                            | TypeAttributes.AutoClass
-                                                            | TypeAttributes.AnsiClass
-                                                            | TypeAttributes.BeforeFieldInit
-                                                            | TypeAttributes.AutoLayout,
-                                                            null);
-
-            var properties = ImplementInterface(type, typeBuilder);
-            ImplementConstructor(typeBuilder, properties);
-
-            return typeBuilder.CreateTypeInfo();
-        }
-
-        static void ImplementConstructor(TypeBuilder typeBuilder, IReadOnlyList<PropertyDescriptor> properties)
-        {
-            var constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public
-                                                                    | MethodAttributes.SpecialName
-                                                                    | MethodAttributes.RTSpecialName
-                                                                    | MethodAttributes.HideBySig,
-                                                                    CallingConventions.Standard,
-                                                                    Type.EmptyTypes);
-
-            var ctrIl = constructorBuilder.GetILGenerator();
-
-            foreach (var property in properties)
-            {
-                var converterType = property.ConverterType;
-                var defaultValue = property.DefaultValue;
-
-                MethodInfo creationMethod;
-                Type defaultValueType;
-                if (defaultValue is string)
-                {
-                    creationMethod = SettingsBuilderHelper.ResolveCreateAndParse(property.PropertyType);
-                    defaultValueType = typeof(string);
-                }
-                else
-                {
-                    creationMethod = SettingsBuilderHelper.ResolveCreate(property.PropertyType);
-                    defaultValueType = property.PropertyType;
-                }
-
-                ctrIl.Emit(OpCodes.Ldarg_0);
-                ctrIl.Emit(OpCodes.Ldstr, property.Name);
-                ctrIl.EmitConstant(defaultValue, defaultValueType);
-                ctrIl.EmitConstant(converterType);
-                ctrIl.Emit(OpCodes.Call, creationMethod);
-                ctrIl.Emit(OpCodes.Stfld, property.FieldBuilder);
-
-                var description = property.Description;
-                if (!string.IsNullOrWhiteSpace(description))
-                {
-                    ctrIl.Emit(OpCodes.Ldarg_0);
-                    ctrIl.Emit(OpCodes.Ldfld, property.FieldBuilder);
-                    ctrIl.Emit(OpCodes.Ldstr, description);
-
-                    var setDescription = property.BackingFieldType.GetProperty("Description").GetSetMethod();
-                    ctrIl.Emit(OpCodes.Callvirt, setDescription);
-                }
-            }
-
-            ctrIl.Emit(OpCodes.Ret);
-        }
-
-        static IReadOnlyList<PropertyDescriptor> ImplementInterface(Type type, TypeBuilder typeBuilder)
-        {
-            typeBuilder.AddInterfaceImplementation(type);
-
-            var properties = new List<PropertyDescriptor>();
-
-            foreach (var property in type.GetProperties())
-            {
-                var fieldBuilder = CreateProperty(typeBuilder, property);
-                properties.Add(fieldBuilder);
-            }
-
-            if (typeof(ISettingsManager).IsAssignableFrom(type))
-            {
-                //TODO
-                //Add Persist
-                //Add Refresh
-                //Add GetReadableValues
-            }
-
-            return properties;
-        }
-
-        static PropertyDescriptor CreateProperty(TypeBuilder typeBuilder, PropertyInfo property)
-        {
-            var propertyName = property.Name;
-            var propertyType = property.PropertyType;
-
-            var fieldBuilder = typeBuilder.DefineField("_" + propertyName, typeof(Setting<>).MakeGenericType(propertyType), FieldAttributes.Private);
-            var valueProperty = fieldBuilder.FieldType.GetProperty("Value");
-
-            var propertyBuilder = typeBuilder.DefineProperty(propertyName, System.Reflection.PropertyAttributes.None, propertyType, null);
-            var getPropMthdBldr = typeBuilder.DefineMethod("get_" + propertyName, PropertyAttributes, propertyType, Type.EmptyTypes);
-
-            var getIl = getPropMthdBldr.GetILGenerator();
-
-            getIl.Emit(OpCodes.Ldarg_0);
-            getIl.Emit(OpCodes.Ldfld, fieldBuilder);
-            getIl.Emit(OpCodes.Callvirt, valueProperty.GetGetMethod());
-            getIl.Emit(OpCodes.Ret);
-
-            var setPropMthdBldr = typeBuilder.DefineMethod("set_" + propertyName, PropertyAttributes, null, new[] { propertyType });
-            var setIl = setPropMthdBldr.GetILGenerator();
-
-            setIl.Emit(OpCodes.Ldarg_0);
-            setIl.Emit(OpCodes.Ldfld, fieldBuilder);
-            setIl.Emit(OpCodes.Ldarg_1);
-            setIl.Emit(OpCodes.Callvirt, valueProperty.GetSetMethod());
-            setIl.Emit(OpCodes.Ret);
-
-            propertyBuilder.SetGetMethod(getPropMthdBldr);
-            propertyBuilder.SetSetMethod(setPropMthdBldr);
-
-            return new PropertyDescriptor(property, propertyBuilder, fieldBuilder);
         }
     }
 }

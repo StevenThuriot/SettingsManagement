@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SettingsManagement.Interfaces;
+using System;
 using System.Collections;
 using System.Configuration;
 using System.Linq;
@@ -87,10 +88,10 @@ namespace SettingsManagement
             if (value is IEnumerable enumerable)
             {
                 var @array = enumerable.Cast<object>().ToArray();
-                return $"{enumerable.GetType().FullName} (Count = {@array.Length}) {{ {string.Join(", ", @array)} }}";
+                return $"{Key} = {enumerable.GetType().FullName} (Count = {@array.Length}) {{ {string.Join(", ", @array)} }}";
             }
 
-            return value.ToString();
+            return $"{Key} = {value}";
         }
     }
 }

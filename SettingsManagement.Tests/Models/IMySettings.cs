@@ -1,9 +1,10 @@
-﻿using System;
+﻿using SettingsManagement.Interfaces;
+using System;
 using System.ComponentModel;
 
 namespace SettingsManagement.Tests.Models
 {
-    public interface IMySettings //: ISettingsManager
+    public interface IMySettings : ISettingsManager, IDisposable
     {
         [DefaultValue(5L), Description("This is a description")]
         long MyFirstProperty { get; set; }

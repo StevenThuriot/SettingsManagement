@@ -1,14 +1,22 @@
-﻿using System;
-using System.Configuration;
+﻿using System.Configuration;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace SettingsManagement
 {
     static class ConfigurationHelper
     {
-        public static readonly MethodInfo OpenConfigurationMethod = new Func<Configuration>(OpenConfiguration).Method;
-        public static readonly MethodInfo RefreshAppSettingsMethod = new Action(RefreshAppSettings).Method;
-        public static readonly MethodInfo PersistMethod = new Action<Configuration>(Persist).Method;
+        public static readonly MethodInfo OpenConfigurationMethod = typeof(ConfigurationHelper).GetMethod(nameof(OpenConfiguration), BindingFlags.Public | BindingFlags.Static);
+        public static readonly MethodInfo RefreshAppSettingsMethod = typeof(ConfigurationHelper).GetMethod(nameof(RefreshAppSettings), BindingFlags.Public | BindingFlags.Static);
+        public static readonly MethodInfo PersistMethod = typeof(ConfigurationHelper).GetMethod(nameof(Persist), BindingFlags.Public | BindingFlags.Static);
+
+        static ConfigurationHelper()
+        {
+            Debug.Assert(OpenConfigurationMethod != null);
+            Debug.Assert(RefreshAppSettingsMethod != null);
+            Debug.Assert(PersistMethod != null);
+        }
+
 
         public static Configuration OpenConfiguration()
         {
@@ -22,7 +30,7 @@ namespace SettingsManagement
 
         public static void Persist(Configuration configuration)
         {
-            configuration.Save();
+            configuration.Save(ConfigurationSaveMode.Modified);
             RefreshAppSettings();
         }
     }

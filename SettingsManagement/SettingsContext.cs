@@ -25,7 +25,7 @@ namespace SettingsManagement
 
         SettingsContext(string scopeName, SettingsContext parentContext)
         {
-            _scopeName = scopeName;
+            _scopeName = "Scope: " + scopeName ?? "Unnamed";
             _parentContext = parentContext ?? throw new ArgumentNullException(nameof(parentContext));
             _managers = new Dictionary<string, object>();
             (_myStack = _localScopeStack.Value).Push(this);
@@ -136,10 +136,10 @@ namespace SettingsManagement
 
         public bool HasManager<T>(string key = null, bool includeParents = true)
         {
-            return HasManagerInternal<T>(ResolveManagerKey<T>(key), includeParents);
+            return HasManagerInternal(ResolveManagerKey<T>(key), includeParents);
         }
 
-        bool HasManagerInternal<T>(string key, bool includeParents)
+        bool HasManagerInternal(string key, bool includeParents)
         {
             var context = this;
             do

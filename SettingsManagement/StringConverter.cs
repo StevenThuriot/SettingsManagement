@@ -1,4 +1,6 @@
-﻿namespace SettingsManagement
+﻿using SettingsManagement.Interfaces;
+
+namespace SettingsManagement
 {
     class StringConverter : IValueConverter<string>
     {

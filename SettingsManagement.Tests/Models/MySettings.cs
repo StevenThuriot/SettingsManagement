@@ -1,9 +1,11 @@
-﻿using System;
+﻿using SettingsManagement.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace SettingsManagement.Tests.Models
 {
-    public class MySettings : IMySettings, ISettingsManager
+    public class MySettings : IMySettings, ISettingsManager, IDisposable
     {
         public MySettings()
         {
@@ -90,6 +92,23 @@ namespace SettingsManagement.Tests.Models
                 _MyThirdProperty.GetReadableValue(),
                 _MyFourthProperty.GetReadableValue()
             };
+        }
+
+        public override string ToString()
+        {
+            return "IMySettingsManager { " + string.Join(", ", GetReadableValues()) + " }";
+        }
+
+        public void Dispose()
+        {
+            var configuration = ConfigurationHelper.OpenConfiguration();
+
+            _MyFirstProperty.Persist(configuration);
+            _MySecondProperty.Persist(configuration);
+            _MyThirdProperty.Persist(configuration);
+            _MyFourthProperty.Persist(configuration);
+
+            ConfigurationHelper.Persist(configuration);
         }
     }
 }
