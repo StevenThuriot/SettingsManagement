@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SettingsManagement.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -113,7 +114,7 @@ namespace SettingsManagement
             return false;
         }
 
-        public T Get<T>(string key = null)
+        public T Get<T>(string key = null, IConfigurationManager configurationManager = null)
         {
             key = ResolveManagerKey<T>(key);
 
@@ -125,7 +126,7 @@ namespace SettingsManagement
                 if (TryGetManager(key, out manager))
                     return manager;
 
-                manager = SettingsManager.New<T>();
+                manager = SettingsManager.New<T>(configurationManager);
                 _managers[key] = manager;
 
                 return manager;

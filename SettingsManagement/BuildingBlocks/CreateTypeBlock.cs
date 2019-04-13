@@ -1,11 +1,12 @@
-﻿using System;
+﻿using SettingsManagement.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 
 namespace SettingsManagement.BuildingBlocks
 {
-    class ImplementInterfaceBlock : Block
+    sealed class CreateTypeBlock : Block
     {
         const MethodAttributes PropertyAttributes = MethodAttributes.Public
                                                              | MethodAttributes.Final
@@ -20,7 +21,9 @@ namespace SettingsManagement.BuildingBlocks
 
         public override IReadOnlyList<PropertyDescriptor> Properties { get; }
 
-        public ImplementInterfaceBlock(Type type, ModuleBuilder moduleBuilder)
+        public override FieldBuilder ConfigurationManagerField { get; }
+
+        public CreateTypeBlock(Type type, ModuleBuilder moduleBuilder)
         {
             var typename = "SettingsManagement.Emit." + type.FullName;
             if (!typename.EndsWith("Manager", StringComparison.OrdinalIgnoreCase))
@@ -34,6 +37,8 @@ namespace SettingsManagement.BuildingBlocks
                                                             | TypeAttributes.BeforeFieldInit
                                                             | TypeAttributes.AutoLayout,
                                                             null);
+
+            ConfigurationManagerField = Builder.DefineField("___configurationManager", typeof(IConfigurationManager), FieldAttributes.Private);
 
             Builder.AddInterfaceImplementation(Interface);
 

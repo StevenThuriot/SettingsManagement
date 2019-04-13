@@ -5,25 +5,24 @@ using System.Diagnostics;
 
 namespace SettingsManagement.Tests.Models
 {
-    public class MySettings : IMySettings, ISettingsManager, IDisposable
+    public class MySettings : IMySettings//, ISettingsManager, IDisposable
     {
-        public MySettings()
+        private readonly IConfigurationManager _configurationManager;
+        public MySettings(IConfigurationManager configurationManager)
         {
-            //converter == TypeConvertAttribute 
-            //If not present --> T Parse(string) method?
-            //Else null
+            _configurationManager = configurationManager;
 
-            _MyFirstProperty = SettingsBuilder<long>.Create(nameof(MyFirstProperty), 1345L, null);
+            _MyFirstProperty = SettingsBuilder<long>.Create(nameof(MyFirstProperty), 1345L, null, configurationManager);
             _MyFirstProperty.Description = "This is a description";
 
-            _MySecondProperty = SettingsBuilder<bool>.Create(nameof(MySecondProperty), default(bool), null);
+            _MySecondProperty = SettingsBuilder<bool>.Create(nameof(MySecondProperty), default(bool), null, configurationManager);
 
-            _MyThirdProperty = SettingsBuilder<string>.Create(nameof(MyThirdProperty), "Test", null);
+            _MyThirdProperty = SettingsBuilder<string>.Create(nameof(MyThirdProperty), "Test", null, configurationManager);
             _MyThirdProperty.Description = "This is another description";
 
-            _MyFourthProperty = SettingsBuilder<TimeSpan>.ParseAndCreate(nameof(MyFourthProperty), "02:00", typeof(TimeSpanConverter));
+            _MyFourthProperty = SettingsBuilder<TimeSpan>.ParseAndCreate(nameof(MyFourthProperty), "02:00", typeof(TimeSpanConverter), configurationManager);
 
-            _MyFifthProperty = SettingsBuilder<bool>.ParseAndCreate(nameof(MyFifthProperty), "Ja", typeof(JaNeeConverter));
+            _MyFifthProperty = SettingsBuilder<bool>.ParseAndCreate(nameof(MyFifthProperty), "Ja", typeof(JaNeeConverter), configurationManager);
         }
 
         readonly Setting<long> _MyFirstProperty;
@@ -63,7 +62,7 @@ namespace SettingsManagement.Tests.Models
 
         public void Refresh()
         {
-            ConfigurationHelper.RefreshAppSettings();
+            _configurationManager.Refresh();
 
             _MyFirstProperty.Refresh();
             _MySecondProperty.Refresh();
@@ -73,14 +72,12 @@ namespace SettingsManagement.Tests.Models
 
         public void Persist()
         {
-            var configuration = ConfigurationHelper.OpenConfiguration();
+            _MyFirstProperty.Persist();
+            _MySecondProperty.Persist();
+            _MyThirdProperty.Persist();
+            _MyFourthProperty.Persist();
 
-            _MyFirstProperty.Persist(configuration);
-            _MySecondProperty.Persist(configuration);
-            _MyThirdProperty.Persist(configuration);
-            _MyFourthProperty.Persist(configuration);
-
-            ConfigurationHelper.Persist(configuration);
+            _configurationManager.Persist();
         }
 
         public IEnumerable<string> GetReadableValues()
@@ -101,14 +98,12 @@ namespace SettingsManagement.Tests.Models
 
         public void Dispose()
         {
-            var configuration = ConfigurationHelper.OpenConfiguration();
+            _MyFirstProperty.Persist();
+            _MySecondProperty.Persist();
+            _MyThirdProperty.Persist();
+            _MyFourthProperty.Persist();
 
-            _MyFirstProperty.Persist(configuration);
-            _MySecondProperty.Persist(configuration);
-            _MyThirdProperty.Persist(configuration);
-            _MyFourthProperty.Persist(configuration);
-
-            ConfigurationHelper.Persist(configuration);
+            _configurationManager.Persist();
         }
     }
 }

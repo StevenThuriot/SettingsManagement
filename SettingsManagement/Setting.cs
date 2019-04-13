@@ -1,15 +1,15 @@
 ﻿using SettingsManagement.Interfaces;
 using System;
 using System.Collections;
-using System.Configuration;
 using System.Linq;
 
 namespace SettingsManagement
 {
-    sealed class Setting<T>
+    sealed class Setting<T> : ISetting
     {
         T _defaultValue;
-        readonly IValueConverter<T> _converter;
+        readonly IConfigurationManager _configurationManager;
+        private readonly IValueConverter<T> _converter;
 
         public T Value { get; set; }
 
@@ -19,14 +19,25 @@ namespace SettingsManagement
         public string Description { get; set; } = "";
 
 
-        public Setting(string key, T defaultValue, IValueConverter<T> converter)
+        public Setting(string key, T defaultValue, IValueConverter<T> converter, IConfigurationManager configurationManager)
         {
-            Key = key;
-            _converter = converter;
+            Key = key ?? throw new ArgumentNullException(nameof(key));
+            _configurationManager = configurationManager ?? throw new ArgumentNullException(nameof(configurationManager));
+            _converter = converter ?? throw new ArgumentNullException(nameof(converter));
+            _defaultValue = defaultValue;
 
-            Value = _defaultValue = defaultValue;
+            var stringValue = _configurationManager.Get(Key);
+            if (string.IsNullOrEmpty(stringValue))
+            {
+                Value = _defaultValue;
+            }
+            else
+            {
+                Value = _converter.Convert(stringValue);
 
-            Refresh(true);
+                if (_defaultValue is null)
+                    _defaultValue = Value;
+            }
         }
 
         public T ResetValue()
@@ -49,30 +60,12 @@ namespace SettingsManagement
                 }
             }
 
-            if (ConfigurationManager.AppSettings.AllKeys.Any(n => n == Key))
-            {
-                Value = _defaultValue = _converter.Convert(ConfigurationManager.AppSettings.Get(Key));
-            }
+            Value = _defaultValue = _converter.Convert(_configurationManager.Get(Key));
         }
 
-        public void Persist(Configuration configuration)
+        public void Persist()
         {
-            Persist(configuration.AppSettings.Settings);
-        }
-
-        public void Persist(KeyValueConfigurationCollection settings)
-        {
-            string stringValue = _converter.ConvertBack(Value);
-
-            var configItem = settings[Key];
-            if (configItem == null)
-            {
-                settings.Add(Key, stringValue);
-            }
-            else
-            {
-                configItem.Value = stringValue;
-            }
+            _configurationManager.Set(Key, _converter.ConvertBack(Value));
         }
 
         public string GetReadableValue()

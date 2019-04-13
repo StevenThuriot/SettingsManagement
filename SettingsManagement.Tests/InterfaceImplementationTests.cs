@@ -3,7 +3,7 @@ using Xunit;
 
 namespace SettingsManagement.Tests
 {
-    public class RefreshTests
+    public class RefreshTests : IClassFixture<DefaultConfigurationManagerTestsFixture>
     {
         [Fact]
         public void CanRefresh()

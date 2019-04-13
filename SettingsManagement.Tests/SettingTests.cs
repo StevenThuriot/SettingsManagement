@@ -4,7 +4,7 @@ using Xunit;
 
 namespace SettingsManagement.Tests
 {
-    public class SettingTests
+    public class SettingTests : IClassFixture<DefaultConfigurationManagerTestsFixture>
     {
         static readonly Random _random = new Random();
         static long GetRandomLong()

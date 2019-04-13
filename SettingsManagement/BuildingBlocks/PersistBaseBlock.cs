@@ -23,21 +23,16 @@ namespace SettingsManagement.BuildingBlocks
 
             var mIl = methodBuilder.GetILGenerator();
 
-            var configuration = mIl.DeclareLocal(ConfigurationHelper.OpenConfigurationMethod.ReturnType);
-
-            mIl.Emit(OpCodes.Call, ConfigurationHelper.OpenConfigurationMethod);
-            mIl.Emit(OpCodes.Stloc, configuration);
-
             foreach (var property in Properties)
             {
                 mIl.Emit(OpCodes.Ldarg_0);
                 mIl.Emit(OpCodes.Ldfld, property.FieldBuilder);
-                mIl.Emit(OpCodes.Ldloc_0);
-                mIl.Emit(OpCodes.Callvirt, property.BackingFieldType.GetMethod("Persist", new Type[] { ConfigurationHelper.OpenConfigurationMethod.ReturnType }));
+                mIl.Emit(OpCodes.Callvirt, ConfigurationHelper.Settings.PersistMethod);
             }
 
-            mIl.Emit(OpCodes.Ldloc_0);
-            mIl.Emit(OpCodes.Call, ConfigurationHelper.PersistMethod);
+            mIl.Emit(OpCodes.Ldarg_0);
+            mIl.Emit(OpCodes.Ldfld, ConfigurationManagerField);
+            mIl.Emit(OpCodes.Call, ConfigurationHelper.Managers.PersistMethod);
 
             mIl.Emit(OpCodes.Ret);
         }

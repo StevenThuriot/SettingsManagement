@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SettingsManagement.Interfaces;
+using System;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -20,13 +21,15 @@ namespace SettingsManagement.BuildingBlocks
 
             var mIl = methodBuilder.GetILGenerator();
 
-            mIl.Emit(OpCodes.Call, ConfigurationHelper.RefreshAppSettingsMethod);
+            mIl.Emit(OpCodes.Ldarg_0);
+            mIl.Emit(OpCodes.Ldfld, ConfigurationManagerField);
+            mIl.Emit(OpCodes.Call, ConfigurationHelper.Managers.RefreshMethod);
 
             foreach (var property in Properties)
             {
                 mIl.Emit(OpCodes.Ldarg_0);
                 mIl.Emit(OpCodes.Ldfld, property.FieldBuilder);
-                mIl.Emit(OpCodes.Callvirt, property.BackingFieldType.GetMethod("Refresh", Type.EmptyTypes));
+                mIl.Emit(OpCodes.Callvirt, ConfigurationHelper.Settings.RefreshMethod);
             }
 
             mIl.Emit(OpCodes.Ret);

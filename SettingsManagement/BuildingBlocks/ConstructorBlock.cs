@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SettingsManagement.Interfaces;
+using System;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -17,9 +18,13 @@ namespace SettingsManagement.BuildingBlocks
                                                                     | MethodAttributes.RTSpecialName
                                                                     | MethodAttributes.HideBySig,
                                                                     CallingConventions.Standard,
-                                                                    Type.EmptyTypes);
+                                                                    new[] { ConfigurationManagerField.FieldType });
 
             var ctrIl = constructorBuilder.GetILGenerator();
+
+            ctrIl.Emit(OpCodes.Ldarg_0);
+            ctrIl.Emit(OpCodes.Ldarg_1);
+            ctrIl.Emit(OpCodes.Stfld, ConfigurationManagerField);
 
             foreach (var property in Properties)
             {
@@ -43,6 +48,7 @@ namespace SettingsManagement.BuildingBlocks
                 ctrIl.Emit(OpCodes.Ldstr, property.Name);
                 ctrIl.EmitConstant(defaultValue, defaultValueType);
                 ctrIl.EmitConstant(converterType);
+                ctrIl.Emit(OpCodes.Ldarg_1);
                 ctrIl.Emit(OpCodes.Call, creationMethod);
                 ctrIl.Emit(OpCodes.Stfld, property.FieldBuilder);
 

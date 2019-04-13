@@ -3,6 +3,16 @@
     public interface IConfigurationManager
     {
         /// <summary>
+        /// Opens the ConfigurationManager
+        /// </summary>
+        void Open();
+
+        /// <summary>
+        /// Closes the ConfigurationManager
+        /// </summary>
+        void Close();
+
+        /// <summary>
         /// Refreshes all settings from configuration source.
         /// </summary>
         void Refresh();
@@ -25,21 +35,5 @@
         /// <param name="key">The unique value key</param>
         /// <param name="value">The value as string</param>
         void Set(string key, string value);
-    }
-
-    public interface IConfigurationManager<T> : IConfigurationManager
-    {
-        /// <summary>
-        /// Gets the value for a certain key typed as <typeparamref name="T"/>.
-        /// </summary>
-        /// <param name="key">The unique value key</param>
-        new T Get(string key);
-
-        /// <summary>
-        /// Sets the value for a certain key typed as <typeparamref name="T"/>.
-        /// </summary>
-        /// <param name="key">The unique value key</param>
-        /// <param name="value">The value typed as <typeparamref name="T"/></param>
-        void Set(string key, T value);
     }
 }

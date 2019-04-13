@@ -10,7 +10,7 @@ namespace SettingsManagement.BuildingBlocks
     {
         public static Block Create(this ModuleBuilder builder, Type type)
         {
-            return new ImplementInterfaceBlock(type, builder);
+            return new CreateTypeBlock(type, builder);
         }
 
         public static Block WithConstructor(this Block block)
@@ -76,6 +76,7 @@ namespace SettingsManagement.BuildingBlocks
         public abstract TypeBuilder Builder { get; }
         public abstract Type Interface { get; }
         public abstract IReadOnlyList<PropertyDescriptor> Properties { get; }
+        public abstract FieldBuilder ConfigurationManagerField { get; }
         public abstract Type Build();
 
     }
@@ -83,9 +84,11 @@ namespace SettingsManagement.BuildingBlocks
     abstract class DecoratorBlock : Block
     {
         readonly Block _block;
-        public override TypeBuilder Builder => _block.Builder;
-        public override Type Interface => _block.Interface;
-        public override IReadOnlyList<PropertyDescriptor> Properties => _block.Properties;
+
+        public sealed override TypeBuilder Builder => _block.Builder;
+        public sealed override Type Interface => _block.Interface;
+        public sealed override IReadOnlyList<PropertyDescriptor> Properties => _block.Properties;
+        public sealed override FieldBuilder ConfigurationManagerField => _block.ConfigurationManagerField;
 
         public DecoratorBlock(Block block)
         {

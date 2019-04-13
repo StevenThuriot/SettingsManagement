@@ -16,5 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SettingsManagement\SettingsManagement.csproj" />
+    <ProjectReference Include="..\SettingsManagment.System.Configuration\SettingsManagment.System.Configuration.csproj" />
   </ItemGroup>
 </Project>

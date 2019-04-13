@@ -1,30 +1,70 @@
 ﻿using SettingsManagement.BuildingBlocks;
+using SettingsManagement.Interfaces;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.ExceptionServices;
 
 namespace SettingsManagement
 {
-    public static class SettingsManager
+    static class SettingsManager
     {
         static readonly AssemblyBuilder _assemblyBuilder;
         static readonly ModuleBuilder _moduleBuilder;
+
+        const string ERRORMSG = "Configuration Manager is NULL. Either supply one or set the default manager in DefaultSettings.Manager.";
 
         static SettingsManager()
         {
             var assemblyName = new AssemblyName("SettingsManagement.Emit");
             _assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndCollect);
             _moduleBuilder = _assemblyBuilder.DefineDynamicModule("SettingsManagement.Emit.Module");
+
+            try
+            {
+                if (DefaultSettings.Manager == null && DefaultSettings.TryToAutoResolveManager)
+                {
+                    var managerTypes = AppDomain.CurrentDomain.GetAssemblies()
+                                                .SelectMany(x => x.GetTypes())
+                                                .Where(x => x.IsClass && !x.IsAbstract && typeof(IConfigurationManager).IsAssignableFrom(x))
+                                                .ToArray();
+
+                    if (managerTypes.Length == 1)
+                    {
+                        DefaultSettings.Manager = (IConfigurationManager)Activator.CreateInstance(managerTypes[0]);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
         }
 
-        public static T New<T>() => Creator<T>.BuildNewInstance();
-
-        static class Creator<T>
+        public static TSettingsManager New<TSettingsManager>(IConfigurationManager manager = null)
         {
-            public static Func<T> BuildNewInstance { get; }
+            if (manager == null)
+                manager = DefaultSettings.Manager ?? throw new ArgumentNullException(nameof(manager), ERRORMSG);
+
+            try
+            {
+                return Creator<TSettingsManager>.BuildNewInstance(manager);
+            }
+            catch (TypeInitializationException ex) when (ex.InnerException != null)
+            {
+                //Catch the exception our Creator CTOR throws and unwrap it.
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+
+                throw; //Won't execute but needed to keep the compiler happy.
+            }
+        }
+
+        static class Creator<TSettingsManager>
+        {
+            public static Func<IConfigurationManager, TSettingsManager> BuildNewInstance { get; }
 
             /// <summary>
             /// Cached Building Delegate
@@ -43,16 +83,19 @@ namespace SettingsManagement
             /// </remarks>
             static Creator()
             {
-                var block = _moduleBuilder.Create(typeof(T))
+                var block = _moduleBuilder.Create(typeof(TSettingsManager))
                                           .WithConstructor()
                                           .WithRefreshIfNeeded()
                                           .WithPersistIfNeeded()
                                           .WithReadableValuesIfNeeded()
-                                          .WithDisposeIfNeeded();
+                                          .WithDisposeIfNeeded()
+                                          ;
 
                 var type = block.Build();
-                var newExpression = Expression.New(type.GetConstructors().Single());
-                var lambda = Expression.Lambda<Func<T>>(newExpression);
+                var ctor = type.GetConstructors().Single();
+                var configurationParameter = Expression.Parameter(typeof(IConfigurationManager), "configurationManager");
+                var newExpression = Expression.New(ctor, configurationParameter);
+                var lambda = Expression.Lambda<Func<IConfigurationManager, TSettingsManager>>(newExpression, configurationParameter);
 
                 BuildNewInstance = lambda.Compile();
             }

@@ -1,37 +1,26 @@
-﻿using System.Configuration;
-using System.Diagnostics;
+﻿using SettingsManagement.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace SettingsManagement
 {
     static class ConfigurationHelper
     {
-        public static readonly MethodInfo OpenConfigurationMethod = typeof(ConfigurationHelper).GetMethod(nameof(OpenConfiguration), BindingFlags.Public | BindingFlags.Static);
-        public static readonly MethodInfo RefreshAppSettingsMethod = typeof(ConfigurationHelper).GetMethod(nameof(RefreshAppSettings), BindingFlags.Public | BindingFlags.Static);
-        public static readonly MethodInfo PersistMethod = typeof(ConfigurationHelper).GetMethod(nameof(Persist), BindingFlags.Public | BindingFlags.Static);
-
-        static ConfigurationHelper()
+        public static class Managers
         {
-            Debug.Assert(OpenConfigurationMethod != null);
-            Debug.Assert(RefreshAppSettingsMethod != null);
-            Debug.Assert(PersistMethod != null);
+            public static readonly MethodInfo RefreshMethod = typeof(IConfigurationManager).GetMethod(nameof(IConfigurationManager.Refresh), Type.EmptyTypes);
+            public static readonly MethodInfo PersistMethod = typeof(IConfigurationManager).GetMethod(nameof(IConfigurationManager.Persist), Type.EmptyTypes);
         }
 
-
-        public static Configuration OpenConfiguration()
+        public static class Settings
         {
-            return ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-        }
-
-        public static void RefreshAppSettings()
-        {
-            ConfigurationManager.RefreshSection("appSettings");
-        }
-
-        public static void Persist(Configuration configuration)
-        {
-            configuration.Save(ConfigurationSaveMode.Modified);
-            RefreshAppSettings();
+            public static readonly MethodInfo RefreshMethod = typeof(ISetting).GetMethod(nameof(ISetting.Refresh), Type.EmptyTypes);
+            public static readonly MethodInfo PersistMethod = typeof(ISetting).GetMethod(nameof(ISetting.Persist), Type.EmptyTypes);
+            public static readonly MethodInfo ReadableValueMethod = typeof(ISetting).GetMethod(nameof(ISetting.GetReadableValue), Type.EmptyTypes);
+            public static readonly MethodInfo ToStringMethod = typeof(object).GetMethod("ToString", Type.EmptyTypes);
+            public static readonly MethodInfo JoinMethod = typeof(string).GetMethod("Join", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string), typeof(IEnumerable<string>) }, null);
+            public static readonly MethodInfo ConcatMethod = typeof(string).GetMethod("Concat", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string), typeof(string), typeof(string) }, null);
         }
     }
 }

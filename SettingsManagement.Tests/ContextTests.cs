@@ -3,7 +3,7 @@ using Xunit;
 
 namespace SettingsManagement.Tests
 {
-    public class ContextTests
+    public class ContextTests : IClassFixture<DefaultConfigurationManagerTestsFixture>
     {
         [Fact]
         public void ContextInstancesAreOnlyCreatedOnce()

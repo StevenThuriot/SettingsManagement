@@ -4,7 +4,11 @@ using System.ComponentModel;
 
 namespace SettingsManagement.Tests.Models
 {
-    public interface IMySettings : ISettingsManager, IDisposable
+    public interface IMySettings :
+        ICanRefresh
+        , ICanPersist
+        , ICanShowMyValues
+        , IDisposable
     {
         [DefaultValue(5L), Description("This is a description")]
         long MyFirstProperty { get; set; }

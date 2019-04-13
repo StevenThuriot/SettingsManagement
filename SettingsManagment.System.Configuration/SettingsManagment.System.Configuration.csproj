@@ -6,16 +6,26 @@
     <!--<NullableContextOptions>enable</NullableContextOptions>-->
     <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
     <Authors>Steven Thuriot</Authors>
-    <Description>Flexible Typed App/Web/*.config Settings Management</Description>
+    <Description>Flexible Typed App/Web/*.config Settings Management with specific implementations for System.Configuration</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/StevenThuriot/SettingsManagement</RepositoryUrl>
     <PackageProjectUrl>https://steventhuriot.github.io/SettingsManagement/</PackageProjectUrl>
     <PackageTags>Settings Configuration Management</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <RootNamespace>SettingsManagment</RootNamespace>
   </PropertyGroup>
-  
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
+    <Reference Include="System.Configuration" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SettingsManagement\SettingsManagement.csproj" />
   </ItemGroup>
 </Project>

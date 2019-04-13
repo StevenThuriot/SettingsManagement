@@ -4,7 +4,7 @@ using Xunit;
 
 namespace SettingsManagement.Tests
 {
-    public class CreationTests
+    public class CreationTests : IClassFixture<DefaultConfigurationManagerTestsFixture>
     {
         [Fact]
         public void AnEntityIsCreated()

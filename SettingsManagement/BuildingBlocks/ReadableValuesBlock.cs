@@ -34,7 +34,7 @@ namespace SettingsManagement.BuildingBlocks
                 rvmIl.EmitInt(i);
                 rvmIl.Emit(OpCodes.Ldarg_0);
                 rvmIl.Emit(OpCodes.Ldfld, property.FieldBuilder);
-                rvmIl.Emit(OpCodes.Callvirt, property.BackingFieldType.GetMethod("GetReadableValue", Type.EmptyTypes));
+                rvmIl.Emit(OpCodes.Callvirt, ConfigurationHelper.Settings.ReadableValueMethod);
                 rvmIl.Emit(OpCodes.Stelem_Ref);
             }
 
@@ -49,7 +49,7 @@ namespace SettingsManagement.BuildingBlocks
                                                                                 typeof(string),
                                                                                 Type.EmptyTypes);
 
-            Builder.DefineMethodOverride(toStringMethodBuilder, typeof(object).GetMethod("ToString"));
+            Builder.DefineMethodOverride(toStringMethodBuilder, ConfigurationHelper.Settings.ToStringMethod);
 
             var tsmIl = toStringMethodBuilder.GetILGenerator();
 
@@ -57,9 +57,9 @@ namespace SettingsManagement.BuildingBlocks
             tsmIl.EmitString(", ");
             tsmIl.Emit(OpCodes.Ldarg_0);
             tsmIl.Emit(OpCodes.Call, readableValuesMethodBuilder);
-            tsmIl.Emit(OpCodes.Call, typeof(string).GetMethod("Join", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string), typeof(IEnumerable<string>) }, null));
+            tsmIl.Emit(OpCodes.Call, ConfigurationHelper.Settings.JoinMethod);
             tsmIl.EmitString(" }");
-            tsmIl.Emit(OpCodes.Call, typeof(string).GetMethod("Concat", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string), typeof(string), typeof(string) }, null));
+            tsmIl.Emit(OpCodes.Call, ConfigurationHelper.Settings.ConcatMethod);
             tsmIl.Emit(OpCodes.Ret);
         }
     }

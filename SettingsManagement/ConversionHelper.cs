@@ -20,7 +20,7 @@ namespace SettingsManagement
                         {
                             if (typeof(T) == typeof(string))
                             {
-                                converter = (IValueConverter<T>)(object)new StringConverter();
+                                converter = (IValueConverter<T>) new StringConverter();
                             }
                             else
                             {
