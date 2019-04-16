@@ -3,12 +3,12 @@ using Xunit;
 
 namespace SettingsManagement.Tests
 {
-    public class RefreshTests : IClassFixture<DefaultConfigurationManagerTestsFixture>
+    public class RefreshTests
     {
         [Fact]
         public void CanRefresh()
         {
-            var settings = SettingsManager.New<IMySettings>();
+            var settings = SettingsManager.New<IMySettings>(new DefaultConfigurationManager());
 
             settings.Refresh();
         }
@@ -16,7 +16,7 @@ namespace SettingsManagement.Tests
         [Fact]
         public void CanPersist()
         {
-            var settings = SettingsManager.New<IMySettings>();
+            var settings = SettingsManager.New<IMySettings>(new DefaultConfigurationManager());
 
             var original = settings.MyFirstProperty;
 
@@ -24,7 +24,7 @@ namespace SettingsManagement.Tests
 
             settings.Persist();
 
-            var settings2 = SettingsManager.New<IMySettings>();
+            var settings2 = SettingsManager.New<IMySettings>(new DefaultConfigurationManager());
 
             Assert.NotEqual(original, settings2.MyFirstProperty);
             Assert.Equal(settings.MyFirstProperty, settings2.MyFirstProperty);

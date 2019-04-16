@@ -1,5 +1,8 @@
 ﻿namespace SettingsManagement.Interfaces
 {
+    /// <summary>
+    /// Configuration Manager Contract
+    /// </summary>
     public interface IConfigurationManager
     {
         /// <summary>

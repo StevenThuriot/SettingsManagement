@@ -22,32 +22,12 @@ namespace SettingsManagement
             var assemblyName = new AssemblyName("SettingsManagement.Emit");
             _assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndCollect);
             _moduleBuilder = _assemblyBuilder.DefineDynamicModule("SettingsManagement.Emit.Module");
-
-            try
-            {
-                if (DefaultSettings.Manager == null && DefaultSettings.TryToAutoResolveManager)
-                {
-                    var managerTypes = AppDomain.CurrentDomain.GetAssemblies()
-                                                .SelectMany(x => x.GetTypes())
-                                                .Where(x => x.IsClass && !x.IsAbstract && typeof(IConfigurationManager).IsAssignableFrom(x))
-                                                .ToArray();
-
-                    if (managerTypes.Length == 1)
-                    {
-                        DefaultSettings.Manager = (IConfigurationManager)Activator.CreateInstance(managerTypes[0]);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-            }
         }
 
         public static TSettingsManager New<TSettingsManager>(IConfigurationManager manager = null)
         {
             if (manager == null)
-                manager = DefaultSettings.Manager ?? throw new ArgumentNullException(nameof(manager), ERRORMSG);
+                manager = SettingsContext.Current.Manager ?? throw new ArgumentNullException(nameof(manager), ERRORMSG);
 
             try
             {

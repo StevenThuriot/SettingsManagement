@@ -1,0 +1,32 @@
+<Project>
+  <PropertyGroup>  
+    <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
+    <LangVersion>preview</LangVersion>
+    <!--<NullableContextOptions>enable</NullableContextOptions>-->
+    <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
+    <Authors>Steven Thuriot</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>Settings Configuration Management</PackageTags>
+    <RepositoryUrl>https://github.com/StevenThuriot/SettingsManagement</RepositoryUrl>
+    <PackageProjectUrl>https://steventhuriot.github.io/SettingsManagement/</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <WarningsAsErrors>$(WarningsAsErrors);CS1591;CS1711</WarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(MSBuildProjectName)'!='SettingsManagement.Tests'">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  
+  <ItemGroup Condition="'$(MSBuildProjectName)'!='SettingsManagement.Tests'">
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>SettingsManagement.Tests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>SettingsManagement.Emit</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+</Project>

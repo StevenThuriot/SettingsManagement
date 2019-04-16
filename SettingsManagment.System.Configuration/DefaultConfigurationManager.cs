@@ -1,66 +1,26 @@
-﻿using SettingsManagement.Interfaces;
-using System.Configuration;
+﻿using System.Configuration;
 
 namespace SettingsManagement
 {
-    public class DefaultConfigurationManager : IConfigurationManager
+    /// <summary>
+    /// Default Configuration Manager Implementation, wrapping around ConfigurationManager.OpenExeConfiguration.
+    /// </summary>
+    public class DefaultConfigurationManager : DefaultConfigurationManagerBase
     {
-        Configuration _configurationManager;
-
-        public void Open()
+        /// <summary>
+        /// Opens the Configuration Manager Instance.
+        /// </summary>
+        public override void Open()
         {
             _configurationManager = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
         }
 
-        public string Get(string key)
+        /// <summary>
+        /// Sets this manager type as the default manager for the current context.
+        /// </summary>
+        public static void ConfigureAsDefault()
         {
-            return EnsureConfigurationManager().AppSettings.Settings[key]?.Value;
-        }
-
-        Configuration EnsureConfigurationManager()
-        {
-            if (_configurationManager == null)
-                Open();
-
-            return _configurationManager;
-        }
-
-        public void Refresh()
-        {
-            ConfigurationManager.RefreshSection("appSettings");
-        }
-
-        public void Persist()
-        {
-            EnsureConfigurationManager().Save(ConfigurationSaveMode.Modified);
-            Refresh();
-        }
-
-        public void Set(string key, string value)
-        {
-            var configuration = EnsureConfigurationManager();
-
-            var item = configuration.AppSettings.Settings[key];
-            if (item == null)
-            {
-                configuration.AppSettings.Settings.Add(key, value);
-            }
-            else
-            {
-                item.Value = value;
-            }
-        }
-
-        public void Close()
-        {
-            _configurationManager = null;
-        }
-
-
-        public static void SetAsDefault()
-        {
-            DefaultSettings.SetAsDefault<DefaultConfigurationManager>();
+            SettingsContext.AppContext.Manager = new DefaultConfigurationManager();
         }
     }
-
 }

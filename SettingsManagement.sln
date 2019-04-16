@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SettingsManagement", "Setti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SettingsManagement.Tests", "SettingsManagement.Tests\SettingsManagement.Tests.csproj", "{9BA6D451-20AF-4BAA-A02B-C3E7F6089559}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SettingsManagment.System.Configuration", "SettingsManagment.System.Configuration\SettingsManagment.System.Configuration.csproj", "{E40D6B99-72BB-4674-BFFE-F57E2A90FAB8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SettingsManagment.System.Configuration", "SettingsManagment.System.Configuration\SettingsManagment.System.Configuration.csproj", "{E40D6B99-72BB-4674-BFFE-F57E2A90FAB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

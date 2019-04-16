@@ -1,18 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
-    <LangVersion>preview</LangVersion>
-    <!--<NullableContextOptions>enable</NullableContextOptions>-->
-    <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
-    <Authors>Steven Thuriot</Authors>
     <Description>Flexible Typed App/Web/*.config Settings Management</Description>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/StevenThuriot/SettingsManagement</RepositoryUrl>
-    <PackageProjectUrl>https://steventhuriot.github.io/SettingsManagement/</PackageProjectUrl>
-    <PackageTags>Settings Configuration Management</PackageTags>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

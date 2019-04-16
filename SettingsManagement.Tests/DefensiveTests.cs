@@ -4,7 +4,7 @@ using Xunit;
 
 namespace SettingsManagement.Tests
 {
-    public class DefensiveTests : IClassFixture<DefaultConfigurationManagerTestsFixture>
+    public class DefensiveTests
     {
         [Fact]
         public void ConvertersHaveToBeIValueConverters()

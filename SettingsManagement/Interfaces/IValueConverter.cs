@@ -7,14 +7,14 @@
     public interface IValueConverter<T>
     {
         /// <summary>
-        /// Converts the <paramref name="value"/> from string to <typeparam name="T">the converter type</typeparam>.
+        /// Converts the <paramref name="value"/> from string to <typeparamref name="T">the converter type</typeparamref>.
         /// </summary>
         /// <param name="value">The value as a string</param>
         /// <returns></returns>
         T Convert(string value);
 
         /// <summary>
-        /// Converts the <paramref name="value"/> from <typeparam name="T">the converter type</typeparam> back to string.
+        /// Converts the <paramref name="value"/> from <typeparamref name="T">the converter type</typeparamref> back to string.
         /// </summary>
         /// <param name="value">The value as string</param>
         string ConvertBack(T value);

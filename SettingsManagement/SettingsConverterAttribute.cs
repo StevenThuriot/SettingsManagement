@@ -3,9 +3,17 @@ using System;
 
 namespace SettingsManagement
 {
+    /// <summary>
+    /// Allows defining a custom Converter for a certain type.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class SettingsConverterAttribute : Attribute
     {
+        /// <summary>
+        /// Constructs a SettingsConverter for a type.
+        /// </summary>
+        /// <param name="type">The converter type.</param>
+        /// <remarks>The type should implement IValueConverter&lt;&gt; </remarks>
         public SettingsConverterAttribute(Type type)
         {
             var converterTypeName = typeof(IValueConverter<>).FullName;
@@ -18,7 +26,14 @@ namespace SettingsManagement
             ConverterType = type;
         }
 
+        /// <summary>
+        /// The type that the converter is used to convert.
+        /// </summary>
         public Type ConversionType { get; }
+
+        /// <summary>
+        /// The type of the converter itself.
+        /// </summary>
         public Type ConverterType { get; }
     }
 }
