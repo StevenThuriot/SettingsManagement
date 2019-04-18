@@ -5,44 +5,45 @@ using System.Linq;
 
 namespace SettingsManagement
 {
-    sealed class Setting<T> : ISetting
+    sealed class Setting<T> : ISettingExtended
     {
-        T _defaultValue;
         readonly IConfigurationManager _configurationManager;
-        private readonly IValueConverter<T> _converter;
+        readonly IValueConverter<T> _converter;
 
         public T Value { get; set; }
+        object ISetting.ResolveValue() => Value;
+
+        public T DefaultValue { get; private set; }
 
         public Type Type { get; } = typeof(T);
 
         public string Key { get; }
-        public string Description { get; set; } = "";
-
+        public string Description { get; set; }
 
         public Setting(string key, T defaultValue, IValueConverter<T> converter, IConfigurationManager configurationManager)
         {
             Key = key ?? throw new ArgumentNullException(nameof(key));
             _configurationManager = configurationManager ?? throw new ArgumentNullException(nameof(configurationManager));
             _converter = converter ?? throw new ArgumentNullException(nameof(converter));
-            _defaultValue = defaultValue;
+            DefaultValue = defaultValue;
 
             var stringValue = _configurationManager.Get(Key);
             if (string.IsNullOrEmpty(stringValue))
             {
-                Value = _defaultValue;
+                Value = DefaultValue;
             }
             else
             {
                 Value = _converter.Convert(stringValue);
 
-                if (_defaultValue is null)
-                    _defaultValue = Value;
+                if (DefaultValue is null)
+                    DefaultValue = Value;
             }
         }
 
-        public T ResetValue()
+        public void Reset()
         {
-            return Value = _defaultValue;
+            Value = DefaultValue;
         }
 
         public void Refresh()
@@ -54,18 +55,23 @@ namespace SettingsManagement
         {
             if (!overwriteChanges)
             {
-                if (!Equals(_defaultValue, Value))
+                if (!Equals(DefaultValue, Value))
                 {
                     return;
                 }
             }
 
-            Value = _defaultValue = _converter.Convert(_configurationManager.Get(Key));
+            if (_configurationManager.TryGet(Key, out var stringValue))
+            {
+                var value = _converter.Convert(stringValue);
+                Value = DefaultValue = value;
+            }
         }
 
         public void Persist()
         {
-            _configurationManager.Set(Key, _converter.ConvertBack(Value));
+            var value = _converter.ConvertBack(Value);
+            _configurationManager.Set(Key, value);
         }
 
         public string GetReadableValue()
@@ -73,10 +79,10 @@ namespace SettingsManagement
             var value = Value;
 
             if (value == null)
-                return "";
+                return $"{Key} = null";
 
             if (value is string @string)
-                return @string;
+                return $"{Key} = {@string}";
 
             if (value is IEnumerable enumerable)
             {

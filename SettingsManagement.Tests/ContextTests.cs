@@ -162,8 +162,14 @@ namespace SettingsManagement.Tests
                     {
                         var settings = scope1.Get<IMySettings>();
                         Assert.NotNull(settings);
+
                         Assert.True(scope2.HasManager<IMySettings>(), "Scopes should have instances from their parent scopes");
+                        settings = scope2.Get<IMySettings>();
+                        Assert.NotNull(settings);
+
                         Assert.True(scope3.HasManager<IMySettings>(), "Scopes should have instances from their parent scopes");
+                        settings = scope3.Get<IMySettings>();
+                        Assert.NotNull(settings);
                     }
 
                     Assert.True(scope2.HasManager<IMySettings>(), "Child scopes should not influence instances from their parent scopes");

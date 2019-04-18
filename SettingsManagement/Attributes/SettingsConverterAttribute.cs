@@ -1,7 +1,7 @@
 ﻿using SettingsManagement.Interfaces;
 using System;
 
-namespace SettingsManagement
+namespace SettingsManagement.Attributes
 {
     /// <summary>
     /// Allows defining a custom Converter for a certain type.

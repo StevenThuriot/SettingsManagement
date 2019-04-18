@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SettingsManagement.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -14,7 +15,7 @@ namespace SettingsManagement.BuildingBlocks
         protected override void GenerateIl()
         {
             var properties = Properties;
-            var readableValuesMethodBuilder = Builder.DefineMethod("GetReadableValues", MethodAttributes.Public
+            var readableValuesMethodBuilder = Builder.DefineMethod(nameof(ICanShowMyValues.GetReadableValues), MethodAttributes.Public
                                                                      | MethodAttributes.Final
                                                                      | MethodAttributes.HideBySig
                                                                      | MethodAttributes.NewSlot
@@ -24,7 +25,7 @@ namespace SettingsManagement.BuildingBlocks
 
             var rvmIl = readableValuesMethodBuilder.GetILGenerator();
             rvmIl.EmitInt(properties.Count);
-            rvmIl.Emit(OpCodes.Newarr, typeof(string));
+            rvmIl.EmitNewArr(typeof(string));
 
             for (int i = 0; i < properties.Count; i++)
             {
@@ -32,15 +33,15 @@ namespace SettingsManagement.BuildingBlocks
 
                 rvmIl.Emit(OpCodes.Dup);
                 rvmIl.EmitInt(i);
-                rvmIl.Emit(OpCodes.Ldarg_0);
-                rvmIl.Emit(OpCodes.Ldfld, property.FieldBuilder);
+                rvmIl.EmitLdarg_0();
+                rvmIl.EmitFld(property.FieldBuilder);
                 rvmIl.Emit(OpCodes.Callvirt, ConfigurationHelper.Settings.ReadableValueMethod);
                 rvmIl.Emit(OpCodes.Stelem_Ref);
             }
 
-            rvmIl.Emit(OpCodes.Ret);
+            rvmIl.EmitRet();
 
-            var toStringMethodBuilder = Builder.DefineMethod("ToString", MethodAttributes.Public
+            var toStringMethodBuilder = Builder.DefineMethod(nameof(string.ToString), MethodAttributes.Public
                                                                                 | MethodAttributes.HideBySig
                                                                                 | MethodAttributes.NewSlot
                                                                                 | MethodAttributes.Virtual
@@ -49,18 +50,18 @@ namespace SettingsManagement.BuildingBlocks
                                                                                 typeof(string),
                                                                                 Type.EmptyTypes);
 
-            Builder.DefineMethodOverride(toStringMethodBuilder, ConfigurationHelper.Settings.ToStringMethod);
+            Builder.DefineMethodOverride(toStringMethodBuilder, ConfigurationHelper.Strings.ToStringMethod);
 
             var tsmIl = toStringMethodBuilder.GetILGenerator();
 
             tsmIl.EmitString(Builder.Name + " { ");
             tsmIl.EmitString(", ");
-            tsmIl.Emit(OpCodes.Ldarg_0);
+            tsmIl.EmitLdarg_0();
             tsmIl.Emit(OpCodes.Call, readableValuesMethodBuilder);
-            tsmIl.Emit(OpCodes.Call, ConfigurationHelper.Settings.JoinMethod);
+            tsmIl.Emit(OpCodes.Call, ConfigurationHelper.Strings.JoinMethod);
             tsmIl.EmitString(" }");
-            tsmIl.Emit(OpCodes.Call, ConfigurationHelper.Settings.ConcatMethod);
-            tsmIl.Emit(OpCodes.Ret);
+            tsmIl.Emit(OpCodes.Call, ConfigurationHelper.Strings.ConcatMethod);
+            tsmIl.EmitRet();
         }
     }
 }

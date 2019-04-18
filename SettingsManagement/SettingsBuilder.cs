@@ -5,7 +5,6 @@ namespace SettingsManagement
 {
     static class SettingsBuilder<T>
     {
-        //TODO: Receive ConfigurationManager instead of converter
         public static Setting<T> Create(string key, T defaultValue, Type converterType, IConfigurationManager configurationManager)
         {
             var converter = ConversionHelper<T>.Resolve(converterType);

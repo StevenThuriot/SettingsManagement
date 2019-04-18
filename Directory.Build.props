@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>  
     <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
-    <LangVersion>preview</LangVersion>
+    <LangVersion>8.0</LangVersion>
     <!--<NullableContextOptions>enable</NullableContextOptions>-->
     <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
     <Authors>Steven Thuriot</Authors>
@@ -29,4 +29,17 @@
       <_Parameter1>SettingsManagement.Emit</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
+  
+  
+  <!-- API MarkDown -->
+  <!--<ItemGroup Condition="'$(MSBuildProjectName)'!='SettingsManagement.Tests'">
+    <PackageReference Include="Vsxmd" Version="1.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)'!='SettingsManagement.Tests'">
+    <DocumentationMarkdown>$(MSBuildProjectDirectory)\bin\$(Configuration)\$(TargetFramework)\$(MSBuildProjectName)_API.md</DocumentationMarkdown>
+  </PropertyGroup>-->
+  
 </Project>

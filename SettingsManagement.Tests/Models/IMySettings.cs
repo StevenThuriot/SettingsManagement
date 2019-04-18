@@ -1,13 +1,19 @@
-﻿using SettingsManagement.Interfaces;
+﻿using SettingsManagement.Attributes;
+using SettingsManagement.Interfaces;
 using System;
 using System.ComponentModel;
 
 namespace SettingsManagement.Tests.Models
 {
+    [SettingsSerializer(typeof(TestableSerializer))]
     public interface IMySettings :
         ICanRefresh
+        , ICanReset
         , ICanPersist
         , ICanShowMyValues
+        , IAmDescriptive
+        , ICanSerialize
+        //, ICanSerializeWith<JsonInstanceSerializer>
         , IDisposable
     {
         [DefaultValue(5L), Description("This is a description")]

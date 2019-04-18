@@ -7,6 +7,17 @@ namespace SettingsManagement
 {
     static class ILGen
     {
+        public static void EmitNewArr(this ILGenerator il, Type type)
+        {
+            il.Emit(OpCodes.Newarr, type);
+        }
+
+        public static void EmitNewArr(this ILGenerator il, Type type, int size)
+        {
+            il.EmitInt(size);
+            il.EmitNewArr(type);
+        }
+
         public static void EmitNew(this ILGenerator il, ConstructorInfo ci)
         {
             if (ci is null)
@@ -348,6 +359,51 @@ namespace SettingsManagement
                 default:
                     throw new InvalidOperationException("Code supposed to be unreachable");
             }
+        }
+
+        public static void EmitLdarg_0(this ILGenerator il)
+        {
+            il.Emit(OpCodes.Ldarg_0);
+        }
+
+        public static void EmitLdloc_0(this ILGenerator il)
+        {
+            il.Emit(OpCodes.Ldloc_0);
+        }
+
+        public static void EmitLdloc_1(this ILGenerator il)
+        {
+            il.Emit(OpCodes.Ldloc_1);
+        }
+
+        public static void EmitStloc_0(this ILGenerator il)
+        {
+            il.Emit(OpCodes.Stloc_0);
+        }
+
+        public static void EmitStloc_1(this ILGenerator il)
+        {
+            il.Emit(OpCodes.Stloc_1);
+        }
+
+        public static void EmitLdarg_1(this ILGenerator il)
+        {
+            il.Emit(OpCodes.Ldarg_1);
+        }
+
+        public static void EmitLdarg(this ILGenerator il, byte index)
+        {
+            il.Emit(OpCodes.Ldarg, index);
+        }
+
+        public static void EmitFld(this ILGenerator il, FieldBuilder field)
+        {
+            il.Emit(OpCodes.Ldfld, field);
+        }
+
+        public static void EmitRet(this ILGenerator il)
+        {
+            il.Emit(OpCodes.Ret);
         }
     }
 }

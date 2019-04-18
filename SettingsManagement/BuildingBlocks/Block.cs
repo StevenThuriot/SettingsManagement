@@ -31,6 +31,19 @@ namespace SettingsManagement.BuildingBlocks
             return new RefreshBlock(block);
         }
 
+        public static Block WithResetIfNeeded(this Block block)
+        {
+            if (typeof(ICanReset).IsAssignableFrom(block.Interface))
+                return block.WithReset();
+
+            return block;
+        }
+
+        public static Block WithReset(this Block block)
+        {
+            return new ResetBlock(block);
+        }
+
         public static Block WithPersistIfNeeded(this Block block)
         {
             if (typeof(ICanPersist).IsAssignableFrom(block.Interface))
@@ -55,6 +68,32 @@ namespace SettingsManagement.BuildingBlocks
         public static Block WithReadableValues(this Block block)
         {
             return new ReadableValuesBlock(block);
+        }
+
+        public static Block WithDescriptionsIfNeeded(this Block block)
+        {
+            if (typeof(IAmDescriptive).IsAssignableFrom(block.Interface))
+                return block.WithDescriptions();
+
+            return block;
+        }
+
+        public static Block WithDescriptions(this Block block)
+        {
+            return new DescriptionsBlock(block);
+        }
+
+        public static Block WithSerializerIfNeeded(this Block block)
+        {
+            if (typeof(ICanSerialize).IsAssignableFrom(block.Interface))
+                return block.WithSerializer();
+
+            return block;
+        }
+
+        public static Block WithSerializer(this Block block)
+        {
+            return new SerializerBlock(block);
         }
 
         public static Block WithDisposeIfNeeded(this Block block)

@@ -1,5 +1,6 @@
 ﻿using SettingsManagement.Interfaces;
 using System.Configuration;
+using System.Linq;
 
 namespace SettingsManagement
 {
@@ -92,5 +93,41 @@ namespace SettingsManagement
         /// Opens the Configuration Manager Instance.
         /// </summary>
         public abstract void Open();
+
+        /// <summary>
+        /// Checks if a certain key exists.
+        /// </summary>
+        /// <param name="key">The unique value key</param>
+        /// <returns>If true the value has been found</returns>
+        public bool Contains(string key)
+        {
+            return _configurationManager
+                        .AppSettings
+                        .Settings
+                        .AllKeys
+                        .Contains(key);
+        }
+
+        /// <summary>
+        /// Gets the value for a certain key as a string.
+        /// </summary>
+        /// <param name="key">The unique value key</param>
+        /// <param name="value">The value belonging to the key</param>
+        /// <returns>True the value has been found</returns>
+        public bool TryGet(string key, out string value)
+        {
+            var item = _configurationManager.AppSettings.Settings[key];
+
+            if (item == null)
+            {
+                value = null;
+                return false;
+            }
+            else
+            {
+                value = item.Value;
+                return true;
+            }
+        }
     }
 }

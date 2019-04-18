@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using SettingsManagement.Attributes;
+using System.ComponentModel;
 
 namespace SettingsManagement.Tests.Models
 {

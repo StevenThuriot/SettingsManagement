@@ -71,19 +71,19 @@ namespace SettingsManagement.BuildingBlocks
 
             var getIl = getPropMthdBldr.GetILGenerator();
 
-            getIl.Emit(OpCodes.Ldarg_0);
-            getIl.Emit(OpCodes.Ldfld, fieldBuilder);
+            getIl.EmitLdarg_0();
+            getIl.EmitFld(fieldBuilder);
             getIl.Emit(OpCodes.Callvirt, valueProperty.GetGetMethod());
-            getIl.Emit(OpCodes.Ret);
+            getIl.EmitRet();
 
             var setPropMthdBldr = typeBuilder.DefineMethod("set_" + propertyName, PropertyAttributes, null, new[] { propertyType });
             var setIl = setPropMthdBldr.GetILGenerator();
 
-            setIl.Emit(OpCodes.Ldarg_0);
-            setIl.Emit(OpCodes.Ldfld, fieldBuilder);
-            setIl.Emit(OpCodes.Ldarg_1);
+            setIl.EmitLdarg_0();
+            setIl.EmitFld(fieldBuilder);
+            setIl.EmitLdarg_1();
             setIl.Emit(OpCodes.Callvirt, valueProperty.GetSetMethod());
-            setIl.Emit(OpCodes.Ret);
+            setIl.EmitRet();
 
             propertyBuilder.SetGetMethod(getPropMthdBldr);
             propertyBuilder.SetSetMethod(setPropMthdBldr);

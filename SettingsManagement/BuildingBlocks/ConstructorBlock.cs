@@ -22,8 +22,8 @@ namespace SettingsManagement.BuildingBlocks
 
             var ctrIl = constructorBuilder.GetILGenerator();
 
-            ctrIl.Emit(OpCodes.Ldarg_0);
-            ctrIl.Emit(OpCodes.Ldarg_1);
+            ctrIl.EmitLdarg_0();
+            ctrIl.EmitLdarg_1();
             ctrIl.Emit(OpCodes.Stfld, ConfigurationManagerField);
 
             foreach (var property in Properties)
@@ -44,27 +44,27 @@ namespace SettingsManagement.BuildingBlocks
                     defaultValueType = property.PropertyType;
                 }
 
-                ctrIl.Emit(OpCodes.Ldarg_0);
+                ctrIl.EmitLdarg_0();
                 ctrIl.Emit(OpCodes.Ldstr, property.Name);
                 ctrIl.EmitConstant(defaultValue, defaultValueType);
                 ctrIl.EmitConstant(converterType);
-                ctrIl.Emit(OpCodes.Ldarg_1);
+                ctrIl.EmitLdarg_1();
                 ctrIl.Emit(OpCodes.Call, creationMethod);
                 ctrIl.Emit(OpCodes.Stfld, property.FieldBuilder);
 
                 var description = property.Description;
                 if (!string.IsNullOrWhiteSpace(description))
                 {
-                    ctrIl.Emit(OpCodes.Ldarg_0);
-                    ctrIl.Emit(OpCodes.Ldfld, property.FieldBuilder);
+                    ctrIl.EmitLdarg_0();
+                    ctrIl.EmitFld(property.FieldBuilder);
                     ctrIl.Emit(OpCodes.Ldstr, description);
 
-                    var setDescription = property.BackingFieldType.GetProperty("Description").GetSetMethod();
+                    var setDescription = ConfigurationHelper.Settings.DescriptionSetter;
                     ctrIl.Emit(OpCodes.Callvirt, setDescription);
                 }
             }
 
-            ctrIl.Emit(OpCodes.Ret);
+            ctrIl.EmitRet();
         }
     }
 }

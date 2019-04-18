@@ -66,8 +66,11 @@ namespace SettingsManagement
                 var block = _moduleBuilder.Create(typeof(TSettingsManager))
                                           .WithConstructor()
                                           .WithRefreshIfNeeded()
+                                          .WithResetIfNeeded()
                                           .WithPersistIfNeeded()
                                           .WithReadableValuesIfNeeded()
+                                          .WithDescriptionsIfNeeded()
+                                          .WithSerializerIfNeeded()
                                           .WithDisposeIfNeeded()
                                           ;
 

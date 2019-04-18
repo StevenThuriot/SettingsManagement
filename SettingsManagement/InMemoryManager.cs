@@ -25,6 +25,17 @@ namespace SettingsManagement
         /// </summary>
         public void Close() { }
 
+
+        /// <summary>
+        /// Checks if a certain key exists.
+        /// </summary>
+        /// <param name="key">The unique value key</param>
+        /// <returns>If true the value has been found</returns>
+        public bool Contains(string key)
+        {
+            return _dictionary.ContainsKey(key);
+        }
+
         /// <summary>
         /// Gets the value for a certain key as a string.
         /// </summary>
@@ -67,6 +78,17 @@ namespace SettingsManagement
         public void Set(string key, string value)
         {
             _dictionary[key] = value;
+        }
+
+        /// <summary>
+        /// Gets the value for a certain key as a string.
+        /// </summary>
+        /// <param name="key">The unique value key</param>
+        /// <param name="value">The value belonging to the key</param>
+        /// <returns>True the value has been found</returns>
+        public bool TryGet(string key, out string value)
+        {
+            return _dictionary.TryGetValue(key, out value);
         }
     }
 }

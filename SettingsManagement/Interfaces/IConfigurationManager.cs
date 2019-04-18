@@ -26,11 +26,26 @@
         void Persist();
 
         /// <summary>
+        /// Checks if a certain key exists.
+        /// </summary>
+        /// <param name="key">The unique value key</param>
+        /// <returns>If true the value has been found</returns>
+        bool Contains(string key);
+
+        /// <summary>
         /// Gets the value for a certain key as a string.
         /// </summary>
         /// <param name="key">The unique value key</param>
         /// <returns></returns>
         string Get(string key);
+
+        /// <summary>
+        /// Gets the value for a certain key as a string.
+        /// </summary>
+        /// <param name="key">The unique value key</param>
+        /// <param name="value">The value belonging to the key</param>
+        /// <returns>True the value has been found</returns>
+        bool TryGet(string key, out string value);
 
         /// <summary>
         /// Sets the value for a certain key as a string.

@@ -25,16 +25,16 @@ namespace SettingsManagement.BuildingBlocks
 
             foreach (var property in Properties)
             {
-                mIl.Emit(OpCodes.Ldarg_0);
-                mIl.Emit(OpCodes.Ldfld, property.FieldBuilder);
+                mIl.EmitLdarg_0();
+                mIl.EmitFld(property.FieldBuilder);
                 mIl.Emit(OpCodes.Callvirt, ConfigurationHelper.Settings.PersistMethod);
             }
 
-            mIl.Emit(OpCodes.Ldarg_0);
-            mIl.Emit(OpCodes.Ldfld, ConfigurationManagerField);
+            mIl.EmitLdarg_0();
+            mIl.EmitFld(ConfigurationManagerField);
             mIl.Emit(OpCodes.Call, ConfigurationHelper.Managers.PersistMethod);
 
-            mIl.Emit(OpCodes.Ret);
+            mIl.EmitRet();
         }
     }
 }
