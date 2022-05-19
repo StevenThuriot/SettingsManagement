@@ -16,7 +16,14 @@
   </ItemGroup>
 
   <ItemGroup>
+	  <Using Include="Xunit"/>
+  </ItemGroup>
+	
+  <ItemGroup>
     <ProjectReference Include="..\SettingsManagement\SettingsManagement.csproj" />
+    <ProjectReference Include="..\SettingsManagment.Secure\SettingsManagment.Secure.csproj" />
+    <ProjectReference Include="..\SettingsManagment.SimpleFile\SettingsManagment.SimpleFile.csproj" />
     <ProjectReference Include="..\SettingsManagment.System.Configuration\SettingsManagment.System.Configuration.csproj" />
   </ItemGroup>
+	
 </Project>

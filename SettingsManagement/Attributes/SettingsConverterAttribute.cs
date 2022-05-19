@@ -26,6 +26,18 @@ public class SettingsConverterAttribute : Attribute
     }
 
     /// <summary>
+    /// Constructs a SettingsConverter for a type.
+    /// </summary>
+    /// <param name="type">The converter type.</param>
+    /// <param name="conversionType">The property type, needed when using converters that support multiple type conversions</param>
+    /// <remarks>The type should implement IValueConverter&lt;&gt; </remarks>
+    public SettingsConverterAttribute(Type type, Type conversionType)
+    {
+        ConversionType = conversionType;
+        ConverterType = type;
+    }
+
+    /// <summary>
     /// The type that the converter is used to convert.
     /// </summary>
     public Type ConversionType { get; }

@@ -23,7 +23,6 @@ public class InMemoryManager : IConfigurationManager
     /// </summary>
     public void Close() { }
 
-
     /// <summary>
     /// Checks if a certain key exists.
     /// </summary>

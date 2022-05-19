@@ -1,5 +1,4 @@
 using SettingsManagement.Tests.Models;
-using Xunit;
 
 namespace SettingsManagement.Tests;
 

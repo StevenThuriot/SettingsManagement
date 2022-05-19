@@ -16,6 +16,7 @@ Currently supported are:
   - Anything you want!
 - Default value through attributes if not supplied by the Configuration Manager
 - Custom Converters per property (e.g. for TimeSpan)
+  - In the SettingsManagment.Secure you'll find a few converters using the DataProtection API to secure your values when persisting
 - Context scopes and children of (think things like DI Containers)
   - With extension methods to automatically set the scopes over threads as well!
 
@@ -224,6 +225,8 @@ In the `SettingsManagment.System.Configuration` package, you can find a few othe
 
 - DefaultConfigurationManager
   - Wraps around the `ConfigurationManager` class.
+- SimpleFileConfigurationManager
+  - Wraps around a simple on disk file. Each line is a setting
 
 ### Or implement your own!
 
