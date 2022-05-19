@@ -1,5 +1,7 @@
 ﻿using SettingsManagement.Interfaces;
 using System.Collections;
+using System.Runtime.InteropServices;
+using System.Security;
 
 namespace SettingsManagement;
 
@@ -74,20 +76,40 @@ sealed class Setting<T> : ISettingExtended
 
     public string GetReadableValue()
     {
-        var value = Value;
+        return $"{Key} = {Read(Value)}";
+    }
 
+    private static string Read(object value)
+    {
         if (value == null)
-            return $"{Key} = null";
+            return "null";
 
         if (value is string @string)
-            return $"{Key} = {@string}";
+            return @string;
+
+        if (value is SecureString secureString)
+            return ReadSecureString(secureString);
 
         if (value is IEnumerable enumerable)
         {
-            var @array = enumerable.Cast<object>().ToArray();
-            return $"{Key} = {enumerable.GetType().FullName} (Count = {@array.Length}) {{ {string.Join(", ", @array)} }}";
+            var @array = enumerable.Cast<object>().Select(Read).ToArray();
+            return $"{enumerable.GetType().FullName} (Count = {@array.Length}) {{ {string.Join(", ", @array)} }}";
         }
 
-        return $"{Key} = {value}";
+        return value.ToString();
+    }
+
+    private static string ReadSecureString(SecureString value)
+    {
+        IntPtr valuePtr = IntPtr.Zero;
+        try
+        {
+            valuePtr = Marshal.SecureStringToGlobalAllocUnicode(value);
+            return Marshal.PtrToStringUni(valuePtr);
+        }
+        finally
+        {
+            Marshal.ZeroFreeGlobalAllocUnicode(valuePtr);
+        }
     }
 }
