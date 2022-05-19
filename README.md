@@ -292,7 +292,19 @@ If you're feeling adventurous, [continuous integration builds](https://ci.appvey
 dotnet add package SettingsManagement
 ```
 
-Default ConfigurationManager implementations are also available as a separate package
+Other packages:
+
+Default ConfigurationManager
 ```
 dotnet add package SettingsManagment.System.Configuration
+```
+
+Simple File ConfigurationManager
+```
+dotnet add package SettingsManagment.SimpleFile
+```
+
+DataProtection implementations
+```
+dotnet add package SettingsManagment.Secure
 ```
