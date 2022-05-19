@@ -1,94 +1,96 @@
 ﻿using SettingsManagement.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace SettingsManagement.BuildingBlocks
+namespace SettingsManagement.BuildingBlocks;
+
+sealed class CreateTypeBlock : Block
 {
-    sealed class CreateTypeBlock : Block
+    const MethodAttributes PropertyAttributes = MethodAttributes.Public
+                                                         | MethodAttributes.Final
+                                                         | MethodAttributes.HideBySig
+                                                         | MethodAttributes.SpecialName
+                                                         | MethodAttributes.NewSlot
+                                                         | MethodAttributes.Virtual;
+
+    public override TypeBuilder Builder { get; }
+
+    public override Type Interface { get; }
+
+    public override IReadOnlyList<PropertyDescriptor> Properties { get; }
+
+    public override FieldBuilder ConfigurationManagerField { get; }
+
+    public CreateTypeBlock(Type type, ModuleBuilder moduleBuilder)
     {
-        const MethodAttributes PropertyAttributes = MethodAttributes.Public
-                                                             | MethodAttributes.Final
-                                                             | MethodAttributes.HideBySig
-                                                             | MethodAttributes.SpecialName
-                                                             | MethodAttributes.NewSlot
-                                                             | MethodAttributes.Virtual;
-
-        public override TypeBuilder Builder { get; }
-
-        public override Type Interface { get; }
-
-        public override IReadOnlyList<PropertyDescriptor> Properties { get; }
-
-        public override FieldBuilder ConfigurationManagerField { get; }
-
-        public CreateTypeBlock(Type type, ModuleBuilder moduleBuilder)
+        if (!type.IsInterface)
         {
-            var typename = "SettingsManagement.Emit." + type.FullName;
-            if (!typename.EndsWith("Manager", StringComparison.OrdinalIgnoreCase))
-                typename += "Manager";
-
-            Interface = type;
-            Builder = moduleBuilder.DefineType(typename, TypeAttributes.Public
-                                                            | TypeAttributes.Class
-                                                            | TypeAttributes.AutoClass
-                                                            | TypeAttributes.AnsiClass
-                                                            | TypeAttributes.BeforeFieldInit
-                                                            | TypeAttributes.AutoLayout,
-                                                            null);
-
-            ConfigurationManagerField = Builder.DefineField("___configurationManager", typeof(IConfigurationManager), FieldAttributes.Private);
-
-            Builder.AddInterfaceImplementation(Interface);
-
-            var properties = new List<PropertyDescriptor>();
-
-            foreach (var property in Interface.GetProperties())
-            {
-                var fieldBuilder = CreateProperty(Builder, property);
-                properties.Add(fieldBuilder);
-            }
-
-            Properties = properties;
+            throw new NotSupportedException("SettingsManager type should be an interface");
         }
 
-        public override Type Build()
+        var typename = "𝒮ettingsManagement." + type.FullName;
+        if (!typename.EndsWith("Manager", StringComparison.OrdinalIgnoreCase))
+            typename += "Manager";
+
+        Interface = type;
+        Builder = moduleBuilder.DefineType(typename, TypeAttributes.Public
+                                                        | TypeAttributes.Class
+                                                        | TypeAttributes.AutoClass
+                                                        | TypeAttributes.AnsiClass
+                                                        | TypeAttributes.BeforeFieldInit
+                                                        | TypeAttributes.AutoLayout,
+                                                        null);
+
+        ConfigurationManagerField = Builder.DefineField("𝒮_configurationManager", typeof(IConfigurationManager), FieldAttributes.Private);
+
+        Builder.AddInterfaceImplementation(Interface);
+
+        var properties = new List<PropertyDescriptor>();
+
+        foreach (var property in Interface.GetProperties())
         {
-            return Builder.CreateTypeInfo().AsType();
+            var fieldBuilder = CreateProperty(Builder, property);
+            properties.Add(fieldBuilder);
         }
 
-        static PropertyDescriptor CreateProperty(TypeBuilder typeBuilder, PropertyInfo property)
-        {
-            var propertyName = property.Name;
-            var propertyType = property.PropertyType;
+        Properties = properties;
+    }
 
-            var fieldBuilder = typeBuilder.DefineField("_" + propertyName, typeof(Setting<>).MakeGenericType(propertyType), FieldAttributes.Private);
-            var valueProperty = fieldBuilder.FieldType.GetProperty("Value");
+    public override Type Build()
+    {
+        return Builder.CreateTypeInfo().AsType();
+    }
 
-            var propertyBuilder = typeBuilder.DefineProperty(propertyName, System.Reflection.PropertyAttributes.None, propertyType, null);
-            var getPropMthdBldr = typeBuilder.DefineMethod("get_" + propertyName, PropertyAttributes, propertyType, Type.EmptyTypes);
+    static PropertyDescriptor CreateProperty(TypeBuilder typeBuilder, PropertyInfo property)
+    {
+        var propertyName = property.Name;
+        var propertyType = property.PropertyType;
 
-            var getIl = getPropMthdBldr.GetILGenerator();
+        var fieldBuilder = typeBuilder.DefineField("_" + propertyName, typeof(Setting<>).MakeGenericType(propertyType), FieldAttributes.Private);
+        var valueProperty = fieldBuilder.FieldType.GetProperty("Value");
 
-            getIl.EmitLdarg_0();
-            getIl.EmitFld(fieldBuilder);
-            getIl.Emit(OpCodes.Callvirt, valueProperty.GetGetMethod());
-            getIl.EmitRet();
+        var propertyBuilder = typeBuilder.DefineProperty(propertyName, System.Reflection.PropertyAttributes.None, propertyType, null);
+        var getPropMthdBldr = typeBuilder.DefineMethod("get_" + propertyName, PropertyAttributes, propertyType, Type.EmptyTypes);
 
-            var setPropMthdBldr = typeBuilder.DefineMethod("set_" + propertyName, PropertyAttributes, null, new[] { propertyType });
-            var setIl = setPropMthdBldr.GetILGenerator();
+        var getIl = getPropMthdBldr.GetILGenerator();
 
-            setIl.EmitLdarg_0();
-            setIl.EmitFld(fieldBuilder);
-            setIl.EmitLdarg_1();
-            setIl.Emit(OpCodes.Callvirt, valueProperty.GetSetMethod());
-            setIl.EmitRet();
+        getIl.EmitLdarg_0();
+        getIl.EmitFld(fieldBuilder);
+        getIl.Emit(OpCodes.Callvirt, valueProperty.GetGetMethod());
+        getIl.EmitRet();
 
-            propertyBuilder.SetGetMethod(getPropMthdBldr);
-            propertyBuilder.SetSetMethod(setPropMthdBldr);
+        var setPropMthdBldr = typeBuilder.DefineMethod("set_" + propertyName, PropertyAttributes, null, new[] { propertyType });
+        var setIl = setPropMthdBldr.GetILGenerator();
 
-            return new PropertyDescriptor(property, propertyBuilder, fieldBuilder);
-        }
+        setIl.EmitLdarg_0();
+        setIl.EmitFld(fieldBuilder);
+        setIl.EmitLdarg_1();
+        setIl.Emit(OpCodes.Callvirt, valueProperty.GetSetMethod());
+        setIl.EmitRet();
+
+        propertyBuilder.SetGetMethod(getPropMthdBldr);
+        propertyBuilder.SetSetMethod(setPropMthdBldr);
+
+        return new PropertyDescriptor(property, propertyBuilder, fieldBuilder);
     }
 }

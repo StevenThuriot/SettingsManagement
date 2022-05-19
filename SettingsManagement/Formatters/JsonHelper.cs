@@ -1,56 +1,55 @@
 ﻿using System.Collections;
 using System.Text;
 
-namespace SettingsManagement.Formatters
+namespace SettingsManagement.Formatters;
+
+static class JsonHelper
 {
-    static class JsonHelper
+    public static void AppendJsonValue(this StringBuilder builder, object value)
     {
-        public static void AppendJsonValue(this StringBuilder builder, object value)
+        if (value is null)
+            return;
+
+        if (value is bool @bool)
         {
-            if (value is null)
-                return;
+            builder.Append(@bool.ToString().ToLowerInvariant());
+        }
+        else if (value is string @string)
+        {
+            builder.Append("\"").Append(@string).Append("\"");
+        }
+        else if (value is IEnumerable enumerable)
+        {
+            builder.Append("[ ");
 
-            if (value is bool @bool)
+            foreach (var item in enumerable)
             {
-                builder.Append(@bool.ToString().ToLowerInvariant());
+                builder.AppendJsonValue(item);
+                builder.Append(", ");
             }
-            else if (value is string @string)
-            {
-                builder.Append("\"").Append(@string).Append("\"");
-            }
-            else if (value is IEnumerable enumerable)
-            {
-                builder.Append("[ ");
 
-                foreach (var item in enumerable)
+            for (int i = builder.Length - 1; i >= 0; i--)
+            {
+                var character = builder[i];
+
+                if (character != ' ' && character != ',' && character != '\r' && character != '\n')
                 {
-                    builder.AppendJsonValue(item);
-                    builder.Append(", ");
+                    if (i < builder.Length - 1)
+                        builder.Length = i + 1;
+
+                    break;
                 }
-
-                for (int i = builder.Length - 1; i >= 0; i--)
-                {
-                    var character = builder[i];
-
-                    if (character != ' ' && character != ',' && character != '\r' && character != '\n')
-                    {
-                        if (i < builder.Length - 1)
-                            builder.Length = i + 1;
-
-                        break;
-                    }
-                }
-
-                builder.Append("]");
             }
-            else if (value.GetType().IsPrimitive)
-            {
-                builder.Append(value);
-            }
-            else
-            {
-                builder.Append("\"").Append(value).Append("\"");
-            }
+
+            builder.Append("]");
+        }
+        else if (value.GetType().IsPrimitive)
+        {
+            builder.Append(value);
+        }
+        else
+        {
+            builder.Append("\"").Append(value).Append("\"");
         }
     }
 }

@@ -1,13 +1,12 @@
-﻿namespace SettingsManagement.Interfaces
+﻿namespace SettingsManagement.Interfaces;
+
+/// <summary>
+/// I Can Persist to Configuration Source
+/// </summary>
+public interface ICanPersist
 {
     /// <summary>
-    /// I Can Persist to Configuration Source
+    /// Persists values to configuration source.
     /// </summary>
-    public interface ICanPersist
-    {
-        /// <summary>
-        /// Persists values to configuration source.
-        /// </summary>
-        void Persist();
-    }
+    void Persist();
 }

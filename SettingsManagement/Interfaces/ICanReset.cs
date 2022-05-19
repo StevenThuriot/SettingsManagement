@@ -1,18 +1,17 @@
-﻿namespace SettingsManagement.Interfaces
+﻿namespace SettingsManagement.Interfaces;
+
+/// <summary>
+/// I Can Reset from Configuration Source
+/// </summary>
+public interface ICanReset
 {
     /// <summary>
-    /// I Can Reset from Configuration Source
+    /// Resets values.
     /// </summary>
-    public interface ICanReset
-    {
-        /// <summary>
-        /// Resets values.
-        /// </summary>
-        void Reset();
+    void Reset();
 
-        /// <summary>
-        /// Resets the value for one single key.
-        /// </summary>
-        void Reset(string key);
-    }
+    /// <summary>
+    /// Resets the value for one single key.
+    /// </summary>
+    void Reset(string key);
 }

@@ -1,6 +1,5 @@
-﻿namespace SettingsManagement.Tests.Models
+﻿namespace SettingsManagement.Tests.Models;
+
+public interface IAmEmpty
 {
-    public interface IAmEmpty
-    {
-    }
 }

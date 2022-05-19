@@ -6,7 +6,6 @@ Currently supported are:
 - Custom Configuration Managers
   - Allows wrapping around 
     - app.config
-    - web.config 
     - or if you'd so desire, even a SQL Server!
 - Custom Serializers
   - Json
@@ -225,8 +224,6 @@ In the `SettingsManagment.System.Configuration` package, you can find a few othe
 
 - DefaultConfigurationManager
   - Wraps around the `ConfigurationManager` class.
-- DefaultWebConfigurationManager
-  - Wraps around the `WebConfigurationManager` class.
 
 ### Or implement your own!
 

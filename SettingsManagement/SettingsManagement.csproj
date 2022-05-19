@@ -3,8 +3,4 @@
   <PropertyGroup>
     <Description>Flexible Typed App/Web/*.config Settings Management</Description>
   </PropertyGroup>
-  
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
-  </ItemGroup>
 </Project>

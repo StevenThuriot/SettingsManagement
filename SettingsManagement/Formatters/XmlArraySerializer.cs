@@ -1,40 +1,37 @@
 ﻿using SettingsManagement.Interfaces;
-using System.Collections;
-using System.Collections.Generic;
 using System.Text;
 
-namespace SettingsManagement.Formatters
+namespace SettingsManagement.Formatters;
+
+/// <summary>
+/// Xml Array Serializer
+/// </summary>
+public class XmlArraySerializer : ISettingsSerializer
 {
     /// <summary>
-    /// Xml Array Serializer
+    /// Format settings to Xml
     /// </summary>
-    public class XmlArraySerializer : ISettingsSerializer
+    /// <param name="settings">The available settings</param>
+    /// <returns></returns>
+    public string Serialize(IReadOnlyList<ISetting> settings)
     {
-        /// <summary>
-        /// Format settings to Xml
-        /// </summary>
-        /// <param name="settings">The available settings</param>
-        /// <returns></returns>
-        public string Serialize(IReadOnlyList<ISetting> settings)
+        var builder = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<root>\r\n");
+
+        const string indent = "  ";
+
+        foreach (var setting in settings)
         {
-            var builder = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<root>\r\n");
+            builder.Append(indent).AppendLine("<element>").Append(indent)
+                   .Append(indent)
+                   .Append("<Key>")
+                   .Append(setting.Key)
+                   .AppendLine("</Key>");
 
-            const string indent = "  ";
+            builder.AppendValueAndDescription(setting, indent);
 
-            foreach (var setting in settings)
-            {
-                builder.Append(indent).AppendLine("<element>").Append(indent)
-                       .Append(indent)
-                       .Append("<Key>")
-                       .Append(setting.Key)
-                       .AppendLine("</Key>");
-
-                builder.AppendValueAndDescription(setting, indent);
-
-                builder.Append(indent).AppendLine("</element>");
-            }
-
-            return builder.Append("</root>").ToString();
+            builder.Append(indent).AppendLine("</element>");
         }
+
+        return builder.Append("</root>").ToString();
     }
 }

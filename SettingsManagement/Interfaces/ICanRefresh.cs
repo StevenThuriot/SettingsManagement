@@ -1,19 +1,18 @@
-﻿namespace SettingsManagement.Interfaces
+﻿namespace SettingsManagement.Interfaces;
+
+/// <summary>
+/// I Can Refresh from Configuration Source
+/// </summary>
+public interface ICanRefresh
 {
     /// <summary>
-    /// I Can Refresh from Configuration Source
+    /// Refreshes values from configuration source.
     /// </summary>
-    public interface ICanRefresh
-    {
-        /// <summary>
-        /// Refreshes values from configuration source.
-        /// </summary>
-        void Refresh();
+    void Refresh();
 
-        /// <summary>
-        /// Refreshes values from configuration source for one single key.
-        /// </summary>
-        /// <param name="key">The specific key to refresh</param>
-        void Refresh(string key);
-    }
+    /// <summary>
+    /// Refreshes values from configuration source for one single key.
+    /// </summary>
+    /// <param name="key">The specific key to refresh</param>
+    void Refresh(string key);
 }

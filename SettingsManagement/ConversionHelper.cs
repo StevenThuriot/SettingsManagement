@@ -1,45 +1,41 @@
 ﻿using SettingsManagement.Interfaces;
-using System;
-using System.Collections.Generic;
 
-namespace SettingsManagement
+namespace SettingsManagement;
+
+static class ConversionHelper<T>
 {
-    static class ConversionHelper<T>
+    static readonly IDictionary<Type, IValueConverter<T>> _cachedConverters = new Dictionary<Type, IValueConverter<T>>();
+    public static IValueConverter<T> Resolve(Type converterType)
     {
-        static readonly IDictionary<Type, IValueConverter<T>> _cachedConverters = new Dictionary<Type, IValueConverter<T>>();
-        public static IValueConverter<T> Resolve(Type converterType)
+        Type key = converterType ?? typeof(T);
+        if (!_cachedConverters.TryGetValue(key, out var converter))
         {
-            Type key = converterType ?? typeof(T);
-            if (!_cachedConverters.TryGetValue(key, out var converter))
+            lock (_cachedConverters)
             {
-                lock (_cachedConverters)
+                if (!_cachedConverters.TryGetValue(key, out converter))
                 {
-                    if (!_cachedConverters.TryGetValue(key, out converter))
+                    if (converterType == null)
                     {
-                        if (converterType == null)
+                        if (typeof(T) == typeof(string))
                         {
-                            if (typeof(T) == typeof(string))
-                            {
-                                converter = (IValueConverter<T>) new StringConverter();
-                            }
-                            else
-                            {
-                                converter = new ParseConverter<T>();
-                            }
-
-                            _cachedConverters[typeof(T)] = converter;
+                            converter = (IValueConverter<T>) new StringConverter();
                         }
                         else
                         {
-                            converter = (IValueConverter<T>)Activator.CreateInstance(converterType);
-                            _cachedConverters[converterType] = converter;
+                            converter = new ParseConverter<T>();
                         }
 
+                        _cachedConverters[typeof(T)] = converter;
+                    }
+                    else
+                    {
+                        converter = (IValueConverter<T>)Activator.CreateInstance(converterType);
+                        _cachedConverters[converterType] = converter;
                     }
                 }
             }
-
-            return converter;
         }
+
+        return converter;
     }
 }
