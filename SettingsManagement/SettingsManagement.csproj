@@ -2,5 +2,6 @@
 
   <PropertyGroup>
     <Description>Flexible Typed App/Web/*.config Settings Management</Description>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 </Project>
