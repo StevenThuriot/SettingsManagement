@@ -14,7 +14,6 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <WarningsAsErrors>$(WarningsAsErrors);CS1591;CS1711</WarningsAsErrors>
   </PropertyGroup>
 

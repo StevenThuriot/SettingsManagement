@@ -99,7 +99,7 @@ public class SimpleFileConfigurationManager : IConfigurationManager
     /// </summary>
     public void Refresh()
     {
-        Close();
+        //Close();
         Open();
     }
 

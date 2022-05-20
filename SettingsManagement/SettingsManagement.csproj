@@ -3,5 +3,6 @@
   <PropertyGroup>
     <Description>Flexible Typed App/Web/*.config Settings Management</Description>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	<IsPackable>true</IsPackable>
   </PropertyGroup>
 </Project>
