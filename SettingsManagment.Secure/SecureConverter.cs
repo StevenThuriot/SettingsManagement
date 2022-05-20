@@ -10,6 +10,16 @@ namespace SettingsManagment.Secure;
 /// </summary>
 public class SecureConverter : IValueConverter<string>, IValueConverter<SecureString>
 {
+    /// <summary>
+    /// The converter's DataProtection Provider instance name
+    /// </summary>
+    public static string Provider = "𝒮ettingsManagement";
+
+    /// <summary>
+    /// The converter's DataProtection Protector instance name
+    /// </summary>
+    public static string Protector = "𝒮ettingsProtector";
+
     private readonly IDataProtector _protector;
 
     /// <summary>
@@ -17,8 +27,8 @@ public class SecureConverter : IValueConverter<string>, IValueConverter<SecureSt
     /// </summary>
     public SecureConverter()
     {
-        var provider = DataProtectionProvider.Create("AniDBAPI"); //TODO
-        _protector = provider.CreateProtector("LoginData");
+        var provider = DataProtectionProvider.Create(Provider);
+        _protector = provider.CreateProtector(Protector);
     }
 
     string IValueConverter<string>.Convert(string value)
@@ -52,7 +62,10 @@ public class SecureConverter : IValueConverter<string>, IValueConverter<SecureSt
         {
             valuePtr = Marshal.SecureStringToGlobalAllocUnicode(value);
             var stringValue = Marshal.PtrToStringUni(valuePtr);
-            return _protector.Protect(stringValue);
+
+            return stringValue is null
+                ? ""
+                : _protector.Protect(stringValue);
         }
         finally
         {
