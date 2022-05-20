@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Flexible Typed App/Web/*.config Settings Management with specific implementations for System.Configuration</Description>
+    <Description>Flexible Typed App.config Settings Management with specific implementations for System.Configuration</Description>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	<IsPackable>true</IsPackable>
   </PropertyGroup>
